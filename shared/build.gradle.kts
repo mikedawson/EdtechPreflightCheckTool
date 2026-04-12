@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.compose.components.resources)
             implementation(libs.navigation.compose)
+
+            api(libs.multiplatform.settings)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -48,7 +48,8 @@ fun App() {
             Scaffold(
                 topBar = {
                     PreflightCheckHeader(
-                        appUiState = appUiStateVal
+                        appUiState = appUiStateVal,
+                        navController = navController,
                     )
                 },
                 floatingActionButton = {
