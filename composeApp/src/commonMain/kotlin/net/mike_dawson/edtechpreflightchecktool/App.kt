@@ -52,31 +52,34 @@ fun App() {
                     )
                 },
                 floatingActionButton = {
-                    ExtendedFloatingActionButton(
-                        modifier = Modifier.testTag("floating_action_button"),
-                        onClick = appUiStateVal.fabState.onClick,
-                        text = {
-                            Text(
-                                modifier = Modifier.testTag("floating_action_button_text"),
-                                text = appUiStateVal.fabState.text?.let {
-                                    uiTextStringResource(it)
-                                } ?: ""
-                            )
-                        },
-                        icon = {
-                            val imageVector = when (appUiStateVal.fabState.icon) {
-                                FabUiState.FabIcon.ADD -> Icons.Default.Add
-                                FabUiState.FabIcon.EDIT -> Icons.Default.Edit
-                                else -> null
-                            }
-                            if (imageVector != null) {
-                                Icon(
-                                    imageVector = imageVector,
-                                    contentDescription = null,
+                    if(appUiStateVal.fabState.visible) {
+                        ExtendedFloatingActionButton(
+                            modifier = Modifier.testTag("floating_action_button"),
+                            onClick = appUiStateVal.fabState.onClick,
+                            text = {
+                                Text(
+                                    modifier = Modifier.testTag("floating_action_button_text"),
+                                    text = appUiStateVal.fabState.text?.let {
+                                        uiTextStringResource(it)
+                                    } ?: ""
                                 )
+                            },
+                            icon = {
+                                val imageVector = when (appUiStateVal.fabState.icon) {
+                                    FabUiState.FabIcon.ADD -> Icons.Default.Add
+                                    FabUiState.FabIcon.EDIT -> Icons.Default.Edit
+                                    else -> null
+                                }
+                                if (imageVector != null) {
+                                    Icon(
+                                        imageVector = imageVector,
+                                        contentDescription = null,
+                                    )
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+
                 }
             ) { innerPadding ->
                 AppNavHost(

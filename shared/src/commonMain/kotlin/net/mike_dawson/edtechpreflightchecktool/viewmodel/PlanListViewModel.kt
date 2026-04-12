@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.app.StringUiText
+import net.mike_dawson.edtechpreflightchecktool.nav.NavCommand
+import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 
 data class PlanListUiState(
     val plans: List<String> = emptyList()
@@ -30,6 +32,13 @@ class PlanListViewModel(
                     visible = true,
                     text = StringUiText("Plan"),
                     icon = FabUiState.FabIcon.ADD,
+                    onClick = {
+                        _navCommandFlow.tryEmit(
+                            NavCommand.Navigate(
+                                destination = PlanEditDest(id = "")
+                            )
+                        )
+                    }
                 )
             )
         }
