@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.navigation.compose)
 
             api(libs.multiplatform.settings)
+            api(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
