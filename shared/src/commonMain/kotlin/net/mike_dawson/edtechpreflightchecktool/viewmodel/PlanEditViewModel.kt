@@ -14,9 +14,12 @@ import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSou
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Cost
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostCategory
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Currency
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Intervention
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import net.mike_dawson.edtechpreflightchecktool.ext.asUiText
+import net.mike_dawson.edtechpreflightchecktool.ext.replaceOrAppend
 import net.mike_dawson.edtechpreflightchecktool.nav.CostEditDest
+import net.mike_dawson.edtechpreflightchecktool.nav.InterventionEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.NavCommand
 import net.mike_dawson.edtechpreflightchecktool.nav.NavResultReturner
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
@@ -70,44 +73,65 @@ class PlanEditViewModel(
                     }
                 }
 
-                navResultReturner.filteredResultFlowForKey(
-                    CostEditViewModel.RESULT_KEY_COST
-                ).collect {
-                    val costResult = it.result as? Cost ?: return@collect
-                    val newCostCategory: String? = savedStateHandle[KEY_ADD_COST_TO_CATEGORY]
+                viewModelScope.launch {
+                    navResultReturner.filteredResultFlowForKey(
+                        CostEditViewModel.RESULT_KEY_COST
+                    ).collect {
+                        val costResult = it.result as? Cost ?: return@collect
+                        val newCostCategory: String? = savedStateHandle[KEY_ADD_COST_TO_CATEGORY]
 
-                    _uiState.update { prev ->
-                        var updatedExisting = false
-                        val updatedCostCategories = prev.plan.costCategories.map { costCategory ->
-                            costCategory.copy(
-                                costs = costCategory.costs.map { costInCategory ->
-                                    if(costInCategory.id == costResult.id) {
-                                        updatedExisting = true
-                                        costResult
-                                    }else {
-                                        costInCategory
-                                    }
-                                }
-                            )
-                        }
-
-                        prev.copy(
-                            plan = prev.plan.copy(
-                                costCategories = if(updatedExisting) {
-                                    updatedCostCategories
-                                }else {
-                                    prev.plan.costCategories.map { costCategory ->
-                                        if(costCategory.name == newCostCategory) {
-                                            costCategory.copy(
-                                                costs = costCategory.costs + costResult
-                                            )
+                        _uiState.update { prev ->
+                            var updatedExisting = false
+                            val updatedCostCategories = prev.plan.costCategories.map { costCategory ->
+                                costCategory.copy(
+                                    costs = costCategory.costs.map { costInCategory ->
+                                        if(costInCategory.id == costResult.id) {
+                                            updatedExisting = true
+                                            costResult
                                         }else {
-                                            costCategory
+                                            costInCategory
                                         }
                                     }
-                                }
+                                )
+                            }
+
+                            prev.copy(
+                                plan = prev.plan.copy(
+                                    costCategories = if(updatedExisting) {
+                                        updatedCostCategories
+                                    }else {
+                                        prev.plan.costCategories.map { costCategory ->
+                                            if(costCategory.name == newCostCategory) {
+                                                costCategory.copy(
+                                                    costs = costCategory.costs + costResult
+                                                )
+                                            }else {
+                                                costCategory
+                                            }
+                                        }
+                                    }
+                                )
                             )
-                        )
+                        }
+                    }
+                }
+
+                viewModelScope.launch {
+                    navResultReturner.filteredResultFlowForKey(
+                        InterventionEditViewModel.RESULT_KEY_INTERVENTION
+                    ).collect { result ->
+                        val intervention = result.result as? Intervention ?: return@collect
+
+                        _uiState.update { prev ->
+                            prev.copy(
+                                plan = prev.plan.copy(
+                                    interventions = prev.plan.interventions.replaceOrAppend(
+                                        element = intervention,
+                                        replacePredicate = { it.id == intervention.id }
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -156,12 +180,42 @@ class PlanEditViewModel(
         }
     }
 
+    fun onClickDeleteIntervention(
+        intervention: Intervention
+    ) {
+        _uiState.update { prev ->
+            prev.copy(
+                plan = prev.plan.copy(
+                    interventions = prev.plan.interventions.filter { it.id != intervention.id }
+                )
+            )
+        }
+    }
+
     fun onClickCost(
         cost: Cost
     ) {
         _navCommandFlow.tryEmit(
             NavCommand.Navigate(
                 destination = CostEditDest.create(cost, uiState.value.plan.currency.code)
+            )
+        )
+    }
+
+    fun onClickIntervention(
+        intervention: Intervention
+    ) {
+        _navCommandFlow.tryEmit(
+            NavCommand.Navigate(
+                destination = InterventionEditDest.create(intervention)
+            )
+        )
+    }
+
+    fun onClickAddIntervention() {
+        _navCommandFlow.tryEmit(
+            NavCommand.Navigate(
+                destination = InterventionEditDest.create(Intervention())
             )
         )
     }

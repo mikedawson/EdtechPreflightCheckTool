@@ -25,9 +25,10 @@ data class Plan(
     val targetNumStudents: Int = 50_000,
     val interventions: List<Intervention> = emptyList(),
     val costCategories: List<CostCategory> = listOf(
+        CostCategory("Intervention direct costs"),
         CostCategory("Infrastructure"),
         CostCategory("Training and support"),
-        CostCategory("Other costs"),
+        CostCategory("Other"),
     ),
     val durationNum: Int = 1,
     val durationUnit: DateTimeUnit = DateTimeUnit.YEAR,

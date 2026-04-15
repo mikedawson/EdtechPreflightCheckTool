@@ -10,10 +10,12 @@ import net.mike_dawson.edtechpreflightchecktool.app.AppUiState
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanListDest
 import net.mike_dawson.edtechpreflightchecktool.components.preflightViewModel
 import net.mike_dawson.edtechpreflightchecktool.nav.CostEditDest
+import net.mike_dawson.edtechpreflightchecktool.nav.InterventionEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanDetailDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.RespectComposeNavController
 import net.mike_dawson.edtechpreflightchecktool.screens.CostEditScreen
+import net.mike_dawson.edtechpreflightchecktool.screens.InterventionEditScreen
 import net.mike_dawson.edtechpreflightchecktool.screens.PlanDetailScreen
 import net.mike_dawson.edtechpreflightchecktool.screens.PlanEditScreen
 import net.mike_dawson.edtechpreflightchecktool.screens.PlanListScreen
@@ -66,6 +68,15 @@ fun AppNavHost(
                 viewModel = preflightViewModel(
                     onSetAppUiState = onSetAppUiState,
                     navHostController = respectNavController,
+                )
+            )
+        }
+
+        composable<InterventionEditDest> {
+            InterventionEditScreen(
+                viewModel = preflightViewModel(
+                    onSetAppUiState = onSetAppUiState,
+                    navHostController = respectNavController
                 )
             )
         }

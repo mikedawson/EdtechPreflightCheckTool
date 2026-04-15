@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Cost
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Intervention
 
 @Serializable
 sealed interface PreflightAppDest
@@ -40,6 +41,25 @@ data class CostEditDest(
             )
         }
 
+    }
+
+}
+
+@Serializable
+data class InterventionEditDest(
+    val interventionStr: String
+): PreflightAppDest {
+
+    @Transient
+    val intervention: Intervention = Json.decodeFromString(Intervention.serializer(), interventionStr)
+
+    companion object {
+
+        fun create(intervention: Intervention) : InterventionEditDest {
+            return InterventionEditDest(
+                interventionStr = Json.encodeToString(Intervention.serializer(), intervention)
+            )
+        }
     }
 
 }

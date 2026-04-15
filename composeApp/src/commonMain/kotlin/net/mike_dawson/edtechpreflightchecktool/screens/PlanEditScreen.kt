@@ -1,19 +1,20 @@
 package net.mike_dawson.edtechpreflightchecktool.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,12 +22,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import net.mike_dawson.edtechpreflightchecktool.components.PreflightExposedDropDownMenuField
 import net.mike_dawson.edtechpreflightchecktool.components.UstadNumberTextField
 import net.mike_dawson.edtechpreflightchecktool.components.defaultItemPadding
 import net.mike_dawson.edtechpreflightchecktool.components.formatCost
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Cost
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostCategory
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Intervention
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanEditUiState
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanEditViewModel
@@ -43,6 +46,9 @@ fun PlanEditScreen(
         onClickNewCost = viewModel::onClickNewCost,
         onClickCost = viewModel::onClickCost,
         onClickDeleteCost = viewModel::onClickDeleteCost,
+        onClickAddIntervention = viewModel::onClickAddIntervention,
+        onClickIntervention = viewModel::onClickIntervention,
+        onClickDeleteIntervention = viewModel::onClickDeleteIntervention,
     )
 }
 
@@ -53,6 +59,9 @@ fun PlanEditScreen(
     onClickNewCost: (CostCategory) -> Unit = { },
     onClickCost: (Cost) -> Unit = { },
     onClickDeleteCost: (Cost) -> Unit = { },
+    onClickAddIntervention: () -> Unit = { },
+    onClickIntervention: (Intervention) -> Unit = { },
+    onClickDeleteIntervention: (Intervention) -> Unit = { },
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -66,16 +75,6 @@ fun PlanEditScreen(
             label = { Text("Name") },
             onValueChange = {
                 onPlanChange(uiState.plan.copy(name = it))
-            }
-        )
-
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().defaultItemPadding(),
-            value = uiState.plan.country,
-            singleLine = true,
-            label = { Text("Country") },
-            onValueChange = {
-                onPlanChange(uiState.plan.copy(country = it))
             }
         )
 
@@ -119,13 +118,49 @@ fun PlanEditScreen(
             }
         )
 
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth().defaultItemPadding(),
-            onClick = {
-
+        ListItem(
+            modifier = Modifier.clickable {
+                onClickAddIntervention()
+            },
+            leadingContent = {
+                Icon(Icons.Default.Add, contentDescription = null)
+            },
+            headlineContent = {
+                Text("Add intervention")
             }
-        ) {
-            Text("Add intervention")
+        )
+
+        uiState.plan.interventions.forEach { intervention ->
+            ListItem(
+                modifier = Modifier.clickable {
+                    onClickIntervention(intervention)
+                },
+                leadingContent = {
+                    Icon(Icons.AutoMirrored.Filled.ListAlt, contentDescription = null)
+                },
+                headlineContent = {
+                    Text(intervention.name + " (${intervention.category.displayName})")
+                },
+                supportingContent = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text("LAYS: ${intervention.laysFrom} to ${intervention.laysTo}")
+                        Text("License: ${intervention.licenseType.displayName}")
+                    }
+                },
+                trailingContent = {
+                    IconButton(
+                        onClick = {
+                            onClickDeleteIntervention(intervention)
+                        }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
+                }
+            )
+
         }
 
         uiState.plan.costCategories.forEach { costCategory ->
