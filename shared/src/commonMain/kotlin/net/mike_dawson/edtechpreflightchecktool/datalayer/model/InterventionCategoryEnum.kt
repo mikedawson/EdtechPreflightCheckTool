@@ -1,4 +1,4 @@
-package net.mike_dawson.edtechpreflightchecktool.datalayer
+package net.mike_dawson.edtechpreflightchecktool.datalayer.model
 
 import kotlinx.serialization.Serializable
 

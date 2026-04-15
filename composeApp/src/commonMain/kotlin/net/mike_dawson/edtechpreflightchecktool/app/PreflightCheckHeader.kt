@@ -2,6 +2,7 @@ package net.mike_dawson.edtechpreflightchecktool.app
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +52,21 @@ fun PreflightCheckHeader(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary
-        )
+        ),
+        actions = {
+            if(appUiState.actionBarButtonState.visible) {
+                Button(
+                    onClick = appUiState.actionBarButtonState.onClick,
+                    enabled = appUiState.actionBarButtonState.enabled ?: true,
+                    modifier = Modifier.testTag("action_bar_button"),
+                ) {
+                    Text(
+                        text = appUiState.actionBarButtonState.text?.let {
+                            uiTextStringResource(it)
+                        } ?: ""
+                    )
+                }
+            }
+        },
     )
 }

@@ -1,4 +1,4 @@
-package net.mike_dawson.edtechpreflightchecktool.datalayer
+package net.mike_dawson.edtechpreflightchecktool.datalayer.model
 
 import kotlinx.serialization.Serializable
 
@@ -6,5 +6,4 @@ import kotlinx.serialization.Serializable
 data class CostCategory(
     val name: String,
     val costs: List<Cost> = emptyList(),
-) {
-}
+)
