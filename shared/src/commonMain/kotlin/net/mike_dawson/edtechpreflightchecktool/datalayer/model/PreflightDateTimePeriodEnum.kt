@@ -1,8 +1,10 @@
 package net.mike_dawson.edtechpreflightchecktool.datalayer.model
 
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.serialization.Serializable
 
-enum class CostRecurrencePeriodEnum(
+@Serializable
+enum class PreflightDateTimePeriodEnum(
     val id: String,
     val displayName: String,
     val dateTimeUnit: DateTimeUnit,

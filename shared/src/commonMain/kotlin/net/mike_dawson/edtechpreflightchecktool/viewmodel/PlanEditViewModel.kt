@@ -135,7 +135,7 @@ class PlanEditViewModel(
 
         _navCommandFlow.tryEmit(
             NavCommand.Navigate(
-                destination = CostEditDest.create(newCost)
+                destination = CostEditDest.create(newCost, uiState.value.plan.currency.code)
             )
         )
     }
@@ -161,7 +161,7 @@ class PlanEditViewModel(
     ) {
         _navCommandFlow.tryEmit(
             NavCommand.Navigate(
-                destination = CostEditDest.create(cost)
+                destination = CostEditDest.create(cost, uiState.value.plan.currency.code)
             )
         )
     }

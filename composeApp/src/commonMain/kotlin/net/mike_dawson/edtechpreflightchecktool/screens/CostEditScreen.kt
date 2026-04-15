@@ -75,40 +75,33 @@ fun CostEditScreen(
                 itemLabel = { it.displayName },
             )
 
-            when(cost.costType) {
-                CostTypeEnum.EXPENSE -> {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Spacer(Modifier.width(16.dp))
-                        Text("Every")
-                        Spacer(Modifier.width(8.dp))
+            if(cost.costType == CostTypeEnum.EXPENSE) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Spacer(Modifier.width(16.dp))
+                    Text("Every")
+                    Spacer(Modifier.width(8.dp))
 
-                        UstadNumberTextField(
-                            modifier = Modifier.padding(vertical = 8.dp).width(96.dp),
-                            value = cost.recurrencePeriodQuantity.toFloat(),
-                            onValueChange = {
-                                onChange(cost.copy(recurrencePeriodQuantity = it.toInt()))
-                            }
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        PreflightExposedDropDownMenuField(
-                            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().weight(1f),
-                            value = cost.recurrencePeriodDurationUnit,
-                            options = uiState.durationOptions,
-                            onOptionSelected = {
-                                onChange(cost.copy(recurrencePeriodDurationUnit = it))
-                            },
-                            itemLabel = { it.displayName },
-                        )
-                        Spacer(Modifier.width(16.dp))
-
-                    }
-                }
-
-                CostTypeEnum.ASSET -> {
-
+                    UstadNumberTextField(
+                        modifier = Modifier.padding(vertical = 8.dp).width(96.dp),
+                        value = cost.recurrencePeriodQuantity.toFloat(),
+                        onValueChange = {
+                            onChange(cost.copy(recurrencePeriodQuantity = it.toInt()))
+                        }
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    PreflightExposedDropDownMenuField(
+                        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().weight(1f),
+                        value = cost.recurrencePeriodDurationUnit,
+                        options = uiState.durationOptions,
+                        onOptionSelected = {
+                            onChange(cost.copy(recurrencePeriodDurationUnit = it))
+                        },
+                        itemLabel = { it.displayName },
+                    )
+                    Spacer(Modifier.width(16.dp))
                 }
             }
 
@@ -142,7 +135,7 @@ fun CostEditScreen(
                                     .defaultItemPadding()
                             }
                         },
-                    label = { Text("USD") },
+                    label = { Text(uiState.currency) },
                     value = cost.costAmount,
                     onValueChange = {
                         onChange(cost.copy(costAmount = it))
@@ -176,6 +169,51 @@ fun CostEditScreen(
                     )
                 }
 
+            }
+
+            if(cost.costType == CostTypeEnum.ASSET) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    UstadNumberTextField(
+                        modifier = Modifier
+                            .width(128.dp)
+                            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp),
+                        label = {
+                            Text("Lifespan")
+                        },
+                        value = cost.assetLifespanQuantity,
+                        onValueChange = {
+                            onChange(cost.copy(assetLifespanQuantity = it))
+                        }
+                    )
+
+                    Spacer(Modifier.width(8.dp))
+
+                    PreflightExposedDropDownMenuField(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, end = 16.dp)
+                            .fillMaxWidth()
+                            .weight(1f),
+                        value = cost.assetLifespanUnit,
+                        options = uiState.durationOptions,
+                        onOptionSelected = {
+                            onChange(cost.copy(assetLifespanUnit = it))
+                        },
+                        itemLabel = { it.displayName },
+                    )
+                }
+
+                UstadNumberTextField(
+                    modifier = Modifier.fillMaxWidth().defaultItemPadding(),
+                    value = cost.assetDisposalCost,
+                    onValueChange = {
+                        onChange(cost.copy(assetDisposalCost = it))
+                    },
+                    label = {
+                        Text("Disposal cost (${uiState.currency})")
+                    }
+                )
             }
         }
 

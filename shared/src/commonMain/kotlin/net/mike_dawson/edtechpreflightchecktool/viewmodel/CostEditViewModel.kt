@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.mike_dawson.edtechpreflightchecktool.app.ActionBarButtonUiState
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Cost
-import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostRecurrencePeriodEnum
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.PreflightDateTimePeriodEnum
 import net.mike_dawson.edtechpreflightchecktool.ext.asUiText
 import net.mike_dawson.edtechpreflightchecktool.nav.CostEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.NavCommand
@@ -16,7 +16,8 @@ import net.mike_dawson.edtechpreflightchecktool.nav.NavResultReturner
 
 data class CostEditUiState(
     val cost: Cost? = null,
-    val durationOptions: List<CostRecurrencePeriodEnum> = CostRecurrencePeriodEnum.entries.toList(),
+    val currency: String = "USD",
+    val durationOptions: List<PreflightDateTimePeriodEnum> = PreflightDateTimePeriodEnum.entries.toList(),
 )
 
 
@@ -29,7 +30,8 @@ class CostEditViewModel(
 
     private val _uiState = MutableStateFlow(
         CostEditUiState(
-            cost = routeDest.cost
+            cost = routeDest.cost,
+            currency = routeDest.currency,
         )
     )
 

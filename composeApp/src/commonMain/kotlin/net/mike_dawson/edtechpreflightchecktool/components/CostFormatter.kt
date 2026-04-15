@@ -11,6 +11,17 @@ fun formatCost(
     currency: Currency,
 ): String {
     return buildString {
+        when(cost.costType) {
+            CostTypeEnum.EXPENSE -> {
+                append("Expense - ")
+            }
+
+            CostTypeEnum.ASSET -> {
+                append("Asset (lifespan: ${cost.assetLifespanQuantity.toDisplayString()} ${cost.assetLifespanUnit.displayName}) - ")
+            }
+        }
+
+
         append(currency.symbol)
         append(" ")
         append(cost.costAmount.toDisplayString())

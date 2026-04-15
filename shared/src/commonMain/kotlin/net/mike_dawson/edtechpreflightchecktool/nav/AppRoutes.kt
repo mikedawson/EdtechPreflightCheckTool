@@ -25,6 +25,7 @@ data class PlanDetailDest(
 @Serializable
 data class CostEditDest(
     val costStr: String,
+    val currency: String,
 ): PreflightAppDest {
 
     @Transient
@@ -32,9 +33,10 @@ data class CostEditDest(
 
     companion object {
 
-        fun create(cost: Cost) : CostEditDest{
+        fun create(cost: Cost, currency: String) : CostEditDest{
             return CostEditDest(
-                costStr = Json.encodeToString(Cost.serializer(), cost)
+                costStr = Json.encodeToString(Cost.serializer(), cost),
+                currency = currency,
             )
         }
 

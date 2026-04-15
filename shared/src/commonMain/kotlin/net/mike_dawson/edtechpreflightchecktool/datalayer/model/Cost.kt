@@ -10,11 +10,12 @@ data class Cost(
     val costType: CostTypeEnum = CostTypeEnum.EXPENSE,
     val recurrent: Boolean = false,
     val recurrencePeriodQuantity: Int = 1,
-    val recurrencePeriodDurationUnit : CostRecurrencePeriodEnum = CostRecurrencePeriodEnum.YEAR,
+    val recurrencePeriodDurationUnit : PreflightDateTimePeriodEnum = PreflightDateTimePeriodEnum.YEAR,
     val costBasis: CostBasisEnum = CostBasisEnum.PER_STUDENT,
     val costBasisPerNum: Float = 1f,
     val costAmount: Float = 1f,
-    val assetLifespanYears: Float = 4f,
+    val assetLifespanQuantity: Float = 4f,
+    val assetLifespanUnit: PreflightDateTimePeriodEnum = PreflightDateTimePeriodEnum.YEAR,
     val assetDisposalCost: Float = 0f,
 ) {
 }
