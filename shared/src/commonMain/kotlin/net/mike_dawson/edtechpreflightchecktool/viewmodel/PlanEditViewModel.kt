@@ -59,84 +59,87 @@ class PlanEditViewModel(
         }
 
         val loadPlanId = routeDest.id
-        if(loadPlanId == null) {
-            _uiState.update { prev ->
-                prev.copy(plan = prev.plan.copy(id = planId))
-            }
-        }else {
-            viewModelScope.launch {
-                val currencies = currencyDataSource.getCurrencies()
-                _uiState.update { it.copy(currencyOptions = currencies) }
 
+        viewModelScope.launch {
+            val currencies = currencyDataSource.getCurrencies()
+            _uiState.update { it.copy(currencyOptions = currencies) }
+
+            if(loadPlanId == null) {
+                _uiState.update { prev ->
+                    prev.copy(plan = prev.plan.copy(id = planId))
+                }
+            }else {
                 dataSource.get(loadPlanId)?.also { plan ->
                     _uiState.update { prev ->
                         prev.copy(plan = plan)
                     }
                 }
+            }
 
-                viewModelScope.launch {
-                    navResultReturner.filteredResultFlowForKey(
-                        CostEditViewModel.RESULT_KEY_COST
-                    ).collect {
-                        val costResult = it.result as? Cost ?: return@collect
-                        val newCostCategoryId: String? = savedStateHandle[KEY_ADD_COST_TO_CATEGORY]
+            viewModelScope.launch {
+                navResultReturner.filteredResultFlowForKey(
+                    CostEditViewModel.RESULT_KEY_COST
+                ).collect {
+                    val costResult = it.result as? Cost ?: return@collect
+                    val newCostCategoryId: String? = savedStateHandle[KEY_ADD_COST_TO_CATEGORY]
 
-                        _uiState.update { prev ->
-                            var updatedExisting = false
-                            val updatedCostCategories = prev.plan.costCategories.map { costCategory ->
-                                costCategory.copy(
-                                    costs = costCategory.costs.map { costInCategory ->
-                                        if(costInCategory.id == costResult.id) {
-                                            updatedExisting = true
-                                            costResult
-                                        }else {
-                                            costInCategory
-                                        }
-                                    }
-                                )
-                            }
-
-                            prev.copy(
-                                plan = prev.plan.copy(
-                                    costCategories = if(updatedExisting) {
-                                        updatedCostCategories
+                    _uiState.update { prev ->
+                        var updatedExisting = false
+                        val updatedCostCategories = prev.plan.costCategories.map { costCategory ->
+                            costCategory.copy(
+                                costs = costCategory.costs.map { costInCategory ->
+                                    if(costInCategory.id == costResult.id) {
+                                        updatedExisting = true
+                                        costResult
                                     }else {
-                                        prev.plan.costCategories.map { costCategory ->
-                                            if(costCategory.id == newCostCategoryId) {
-                                                costCategory.copy(
-                                                    costs = costCategory.costs + costResult
-                                                )
-                                            }else {
-                                                costCategory
-                                            }
-                                        }
+                                        costInCategory
                                     }
-                                )
+                                }
                             )
                         }
+
+                        prev.copy(
+                            plan = prev.plan.copy(
+                                costCategories = if(updatedExisting) {
+                                    updatedCostCategories
+                                }else {
+                                    prev.plan.costCategories.map { costCategory ->
+                                        if(costCategory.id == newCostCategoryId) {
+                                            costCategory.copy(
+                                                costs = costCategory.costs + costResult
+                                            )
+                                        }else {
+                                            costCategory
+                                        }
+                                    }
+                                }
+                            )
+                        )
                     }
                 }
+            }
 
-                viewModelScope.launch {
-                    navResultReturner.filteredResultFlowForKey(
-                        InterventionEditViewModel.RESULT_KEY_INTERVENTION
-                    ).collect { result ->
-                        val intervention = result.result as? Intervention ?: return@collect
+            viewModelScope.launch {
+                navResultReturner.filteredResultFlowForKey(
+                    InterventionEditViewModel.RESULT_KEY_INTERVENTION
+                ).collect { result ->
+                    println("FBS: received $result")
+                    val intervention = result.result as? Intervention ?: return@collect
 
-                        _uiState.update { prev ->
-                            prev.copy(
-                                plan = prev.plan.copy(
-                                    interventions = prev.plan.interventions.replaceOrAppend(
-                                        element = intervention,
-                                        replacePredicate = { it.id == intervention.id }
-                                    )
+                    _uiState.update { prev ->
+                        prev.copy(
+                            plan = prev.plan.copy(
+                                interventions = prev.plan.interventions.replaceOrAppend(
+                                    element = intervention,
+                                    replacePredicate = { it.id == intervention.id }
                                 )
                             )
-                        }
+                        )
                     }
                 }
             }
         }
+
 
 
     }
