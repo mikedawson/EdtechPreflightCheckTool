@@ -2,11 +2,14 @@ package net.mike_dawson.edtechpreflightchecktool.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -29,7 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import net.mike_dawson.edtechpreflightchecktool.components.CostTotalsColumn
+import net.mike_dawson.edtechpreflightchecktool.components.InfoCard
 import net.mike_dawson.edtechpreflightchecktool.components.formatCost
+import net.mike_dawson.edtechpreflightchecktool.components.toDisplayString
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailUiState
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailViewModel
 
@@ -51,6 +56,7 @@ fun PlanDetailScreen(
     onToggleSectionIdCollapse: (String) -> Unit = { },
 ) {
     val currencySymbol = uiState.plan?.currency?.symbol?: ""
+    val currencyCode = uiState.plan?.currency?.code ?: ""
     val plan = uiState.plan
 
     LazyColumn(
@@ -59,27 +65,76 @@ fun PlanDetailScreen(
         if(plan != null) {
             item {
                 FlowRow(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    InfoCard(
+                        headlineText = "Students",
+                        contentText = plan.targetNumStudents.toString(),
+                    )
+
+                    InfoCard(
+                        headlineText = "Avg. students per class",
+                        contentText = plan.averageStudentsPerClass.toDisplayString(),
+                    )
+
+                    InfoCard(
+                        headlineText = "Avg classes per school",
+                        contentText = plan.averageClassesPerSchool.toDisplayString(),
+                    )
+                }
+            }
+
+            item {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     uiState.costTotals[PlanDetailViewModel.ID_TOTAL]?.also { grandTotals ->
-                        //As per https://developer.android.com/develop/ui/compose/components/card?_gl=1*1ij2cas*_ga*MTY5MjA3MzQ2Mi4xNzU4NjUzOTc0*_ga_QPQ2NRV856*czE3NzYzMjYwMjMkbzI5JGcxJHQxNzc2MzI2MDQ0JGozOSRsMCRoMA..
+                        InfoCard(
+                            headlineText = "Total cost/year",
+                            contentText = "$currencySymbol ${grandTotals.totalCost.toDisplayString()}"
+                        )
+
+                        InfoCard(
+                            headlineText = "Marginal cost/student/year",
+                            contentText = "$currencySymbol ${grandTotals.totalMarginalCostPerStudent.toDisplayString()}"
+                        )
+
+                        InfoCard(
+                            headlineText = "Total cost/student/year",
+                            contentText = "$currencySymbol ${grandTotals.totalCostPerStudent.toDisplayString()}"
+                        )
+                    }
+                }
+            }
+
+            uiState.laysTotal?.also { laysTotal ->
+                item {
+                    Box(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         Card(
                             colors = CardDefaults.outlinedCardColors(),
                             border = BorderStroke(1.dp, Color.Black),
                         ) {
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(16.dp).width(512.dp),
                             ) {
-                                Text("Total Cost/year")
+                                Text("LAYS")
                                 Text(
                                     style = MaterialTheme.typography.headlineLarge,
-                                    text = "$currencySymbol ${grandTotals.totalCost}"
+                                    text = "${laysTotal.laysFromPer100Currency.toDisplayString()}-${laysTotal.laysToPer100Currency.toDisplayString()} per 100 $currencySymbol $currencyCode",
                                 )
                             }
                         }
                     }
                 }
             }
+
+
 
             plan.costCategories.forEach { category ->
                 val isCollapsed = category.id in uiState.collapsedSectionIds

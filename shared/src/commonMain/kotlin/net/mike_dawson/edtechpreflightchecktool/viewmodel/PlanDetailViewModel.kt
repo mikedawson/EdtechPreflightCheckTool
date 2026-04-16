@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostTotals
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.LaysTotal
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import net.mike_dawson.edtechpreflightchecktool.ext.asUiText
 import net.mike_dawson.edtechpreflightchecktool.ext.getAnnualTotals
@@ -22,6 +23,7 @@ import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 data class PlanDetailUiState(
     val plan: Plan? = null,
     val costTotals: Map<String, CostTotals> = emptyMap(),
+    val laysTotal: LaysTotal? = null,
     val collapsedSectionIds: Set<String> = emptySet(),
 )
 
@@ -74,8 +76,26 @@ class PlanDetailViewModel(
 
                         put(ID_TOTAL, totalsPerCategory.sumCostTotals(ID_TOTAL))
                     }
+                    val grandTotals = costTotalMap[ID_TOTAL] ?: throw IllegalStateException("Uh, what?")
 
-                    _uiState.update { prev -> prev.copy(costTotals = costTotalMap) }
+                    val laysFromTotal = plan.interventions.sumOf { it.laysFrom.toDouble() }.toFloat()
+                    val laysToTotal = plan.interventions.sumOf { it.laysTo.toDouble() }.toFloat()
+
+                    _uiState.update { prev ->
+                        prev.copy(
+                            costTotals = costTotalMap,
+                            laysTotal = if(laysFromTotal != 0f && laysToTotal != 0f) {
+                                LaysTotal(
+                                    from = laysFromTotal,
+                                    to = laysToTotal,
+                                    laysFromPerCurrency = laysFromTotal / grandTotals.totalCostPerStudent,
+                                    laysToPerCurrency = laysToTotal / grandTotals.totalCostPerStudent
+                                )
+                            }else {
+                                null
+                            }
+                        )
+                    }
                 }
 
                 _appUiState.update { prev ->
