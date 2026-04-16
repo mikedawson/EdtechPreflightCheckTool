@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Receipt
@@ -134,6 +135,35 @@ fun PlanDetailScreen(
                 }
             }
 
+            item {
+                ListItem(
+                    headlineContent = {
+                        Text("Interventions (${plan.interventions.size})")
+                    }
+                )
+            }
+
+            plan.interventions.forEach { intervention ->
+                item {
+                    ListItem(
+                        leadingContent = {
+                            Icon(Icons.AutoMirrored.Filled.ListAlt, contentDescription = null)
+                        },
+                        headlineContent = {
+                            Text(intervention.name)
+                        },
+                        supportingContent = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                Text("LAYS: ${intervention.laysFrom} to ${intervention.laysTo}")
+                                Text("License: ${intervention.licenseType.displayName}")
+                            }
+                        },
+                    )
+                }
+            }
 
 
             plan.costCategories.forEach { category ->
