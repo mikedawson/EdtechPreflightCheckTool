@@ -57,30 +57,32 @@ class PlanDetailViewModel(
         }
 
         viewModelScope.launch {
-            val plan = dataSource.get(routeDest.id)
-            _uiState.update { prev ->
-                prev.copy(plan = plan)
-            }
+            dataSource.getAsFlow(routeDest.id).collect { plan ->
+                _uiState.update { prev ->
+                    prev.copy(plan = plan)
+                }
 
-            if(plan != null) {
-                val costTotalMap = buildMap {
-                    val totalsPerCategory = plan.costCategories.map { category ->
-                        val costsForCategory = category.costs.map { it.getAnnualTotals(plan) }
-                        putAll(costsForCategory.associateBy { it.forId })
-                        costsForCategory.sumCostTotals(category.id).also {
-                            put(category.id, it)
+                if(plan != null) {
+                    val costTotalMap = buildMap {
+                        val totalsPerCategory = plan.costCategories.map { category ->
+                            val costsForCategory = category.costs.map { it.getAnnualTotals(plan) }
+                            putAll(costsForCategory.associateBy { it.forId })
+                            costsForCategory.sumCostTotals(category.id).also {
+                                put(category.id, it)
+                            }
                         }
+
+                        put(ID_TOTAL, totalsPerCategory.sumCostTotals(ID_TOTAL))
                     }
 
-                    put(ID_TOTAL, totalsPerCategory.sumCostTotals(ID_TOTAL))
+                    _uiState.update { prev -> prev.copy(costTotals = costTotalMap) }
                 }
-                _uiState.update { prev -> prev.copy(costTotals = costTotalMap) }
-            }
 
-            _appUiState.update { prev ->
-                prev.copy(
-                    title = plan?.name?.asUiText()
-                )
+                _appUiState.update { prev ->
+                    prev.copy(
+                        title = plan?.name?.asUiText()
+                    )
+                }
             }
         }
     }

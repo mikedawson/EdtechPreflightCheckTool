@@ -9,8 +9,13 @@ import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 
 val Cost.costAmountAnnual: Float
     get() = when(this.costType) {
-        CostTypeEnum.EXPENSE -> costAmount * recurrencePeriodDurationUnit.unitsPerYear
-        CostTypeEnum.ASSET -> (costAmount + assetDisposalCost) / (assetLifespanQuantity * assetLifespanUnit.unitsPerYear)
+        CostTypeEnum.EXPENSE -> {
+            costAmount * (recurrencePeriodDurationUnit.unitsPerYear.toFloat() / recurrencePeriodQuantity.toFloat())
+        }
+
+        CostTypeEnum.ASSET -> {
+            (costAmount + assetDisposalCost) / (assetLifespanQuantity * (1.toFloat() / assetLifespanUnit.unitsPerYear))
+        }
     }
 
 

@@ -40,6 +40,12 @@ class PlanDataSource(
         }
     }
 
+    fun getAsFlow(id: String): Flow<Plan?> {
+        return _invalidationFlow.map {
+            get(id)
+        }
+    }
+
     fun listAllAsFlow(): Flow<List<Plan>> {
         return _invalidationFlow.map {
             settings.keys.filter { it.startsWith(KEY_ID_PREFIX) }
