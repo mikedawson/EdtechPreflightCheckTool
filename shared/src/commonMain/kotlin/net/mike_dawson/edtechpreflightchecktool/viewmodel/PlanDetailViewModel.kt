@@ -10,14 +10,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostTotals
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import net.mike_dawson.edtechpreflightchecktool.ext.asUiText
+import net.mike_dawson.edtechpreflightchecktool.ext.getAnnualTotals
+import net.mike_dawson.edtechpreflightchecktool.ext.sumCostTotals
 import net.mike_dawson.edtechpreflightchecktool.nav.NavCommand
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanDetailDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 
 data class PlanDetailUiState(
     val plan: Plan? = null,
+    val costTotals: Map<String, CostTotals> = emptyMap(),
+    val collapsedSectionIds: Set<String> = emptySet(),
 )
 
 class PlanDetailViewModel(
@@ -54,9 +59,22 @@ class PlanDetailViewModel(
         viewModelScope.launch {
             val plan = dataSource.get(routeDest.id)
             _uiState.update { prev ->
-                prev.copy(
-                    plan = plan
-                )
+                prev.copy(plan = plan)
+            }
+
+            if(plan != null) {
+                val costTotalMap = buildMap {
+                    val totalsPerCategory = plan.costCategories.map { category ->
+                        val costsForCategory = category.costs.map { it.getAnnualTotals(plan) }
+                        putAll(costsForCategory.associateBy { it.forId })
+                        costsForCategory.sumCostTotals(category.id).also {
+                            put(category.id, it)
+                        }
+                    }
+
+                    put(ID_TOTAL, totalsPerCategory.sumCostTotals(ID_TOTAL))
+                }
+                _uiState.update { prev -> prev.copy(costTotals = costTotalMap) }
             }
 
             _appUiState.update { prev ->
@@ -65,6 +83,23 @@ class PlanDetailViewModel(
                 )
             }
         }
+    }
+
+    fun onToggleSectionIdCollapse(id: String) {
+        _uiState.update {
+            it.copy(
+                collapsedSectionIds = if(it.collapsedSectionIds.contains(id)) {
+                    it.collapsedSectionIds - id
+                }else {
+                    it.collapsedSectionIds + id
+                }
+            )
+        }
+    }
+
+    companion object {
+
+        const val ID_TOTAL = "total"
     }
 
 }
