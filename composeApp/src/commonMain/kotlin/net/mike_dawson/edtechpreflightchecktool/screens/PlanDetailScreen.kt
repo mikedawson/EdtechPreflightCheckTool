@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -236,7 +238,6 @@ fun PlanDetailScreen(
                                         Icon(Icons.Outlined.Info, contentDescription = "Info")
                                     }
                                 }
-
                             }
                         )
                     }
@@ -246,6 +247,8 @@ fun PlanDetailScreen(
             //show loading
         }
 
-
+        item {
+            Spacer(Modifier.height(96.dp))
+        }
     }
 }

@@ -22,6 +22,7 @@ import net.mike_dawson.edtechpreflightchecktool.nav.CostEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.InterventionEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.NavCommand
 import net.mike_dawson.edtechpreflightchecktool.nav.NavResultReturner
+import net.mike_dawson.edtechpreflightchecktool.nav.PlanDetailDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 import kotlin.uuid.Uuid
 
@@ -78,7 +79,7 @@ class PlanEditViewModel(
                         CostEditViewModel.RESULT_KEY_COST
                     ).collect {
                         val costResult = it.result as? Cost ?: return@collect
-                        val newCostCategory: String? = savedStateHandle[KEY_ADD_COST_TO_CATEGORY]
+                        val newCostCategoryId: String? = savedStateHandle[KEY_ADD_COST_TO_CATEGORY]
 
                         _uiState.update { prev ->
                             var updatedExisting = false
@@ -101,7 +102,7 @@ class PlanEditViewModel(
                                         updatedCostCategories
                                     }else {
                                         prev.plan.costCategories.map { costCategory ->
-                                            if(costCategory.name == newCostCategory) {
+                                            if(costCategory.id == newCostCategoryId) {
                                                 costCategory.copy(
                                                     costs = costCategory.costs + costResult
                                                 )
@@ -155,7 +156,7 @@ class PlanEditViewModel(
             id = Uuid.random().toString(),
             name = "",
         )
-        savedStateHandle[KEY_ADD_COST_TO_CATEGORY] = costCategory.name
+        savedStateHandle[KEY_ADD_COST_TO_CATEGORY] = costCategory.id
 
         _navCommandFlow.tryEmit(
             NavCommand.Navigate(
@@ -220,9 +221,67 @@ class PlanEditViewModel(
         )
     }
 
+    fun onChangeCategoryName(
+        categoryId: String,
+        newName: String
+    ) {
+        _uiState.update { prev ->
+            prev.copy(
+                plan = prev.plan.copy(
+                    costCategories = prev.plan.costCategories.map {
+                        if(it.id == categoryId) {
+                            it.copy(name = newName)
+                        }else {
+                            it
+                        }
+                    }
+                )
+            )
+        }
+    }
+
+    fun onClickDeleteCostCategory(
+        category: CostCategory
+    ) {
+        _uiState.update { prev ->
+            prev.copy(
+                plan = prev.plan.copy(
+                    costCategories = prev.plan.costCategories.filter { it.id != category.id }
+                )
+            )
+        }
+    }
+
+    fun onClickAddCostCategory() {
+        _uiState.update { prev ->
+            prev.copy(
+                plan = prev.plan.copy(
+                    costCategories = prev.plan.costCategories + CostCategory(
+                        name = "",
+                        id = Uuid.random().toString(),
+                        costs = emptyList()
+                    )
+                )
+            )
+        }
+    }
+
+
     fun onClickSave() {
         dataSource.store(uiState.value.plan)
-        _navCommandFlow.tryEmit(NavCommand.PopUp())
+
+        if(routeDest.id == null){
+            _navCommandFlow.tryEmit(
+                NavCommand.Navigate(
+                    destination = PlanDetailDest(id = planId),
+                    popUpToClass = PlanEditDest::class,
+                    popUpToInclusive = true,
+                )
+            )
+        }else {
+            _navCommandFlow.tryEmit(NavCommand.PopUp())
+        }
+
     }
 
     companion object {

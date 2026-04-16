@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TableView
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +46,9 @@ fun PlanListScreen(
             ListItem(
                 modifier = Modifier.clickable{
                     onCLickItem(plan)
+                },
+                leadingContent = {
+                    Icon(Icons.Default.TableView, contentDescription = null)
                 },
                 headlineContent = {
                     Text(plan.name)

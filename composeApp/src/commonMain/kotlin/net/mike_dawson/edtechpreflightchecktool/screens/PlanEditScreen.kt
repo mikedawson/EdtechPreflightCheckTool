@@ -49,6 +49,9 @@ fun PlanEditScreen(
         onClickAddIntervention = viewModel::onClickAddIntervention,
         onClickIntervention = viewModel::onClickIntervention,
         onClickDeleteIntervention = viewModel::onClickDeleteIntervention,
+        onChangeCategoryName = viewModel::onChangeCategoryName,
+        onClickAddCostCategory = viewModel::onClickAddCostCategory,
+        onClickDeleteCostCategory = viewModel::onClickDeleteCostCategory,
     )
 }
 
@@ -62,6 +65,9 @@ fun PlanEditScreen(
     onClickAddIntervention: () -> Unit = { },
     onClickIntervention: (Intervention) -> Unit = { },
     onClickDeleteIntervention: (Intervention) -> Unit = { },
+    onChangeCategoryName: (id: String, newName: String) -> Unit = { _, _ -> },
+    onClickAddCostCategory: () -> Unit = { },
+    onClickDeleteCostCategory: (CostCategory) -> Unit = { },
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -163,10 +169,42 @@ fun PlanEditScreen(
 
         }
 
+        ListItem(
+            modifier = Modifier.clickable {
+                onClickAddCostCategory()
+            },
+            leadingContent = {
+                Icon(Icons.Default.Add, contentDescription = null)
+            },
+            headlineContent = {
+                Text("Add cost category")
+            }
+        )
+
+
         uiState.plan.costCategories.forEach { costCategory ->
             ListItem(
                 headlineContent = {
-                    Text(costCategory.name)
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        value = costCategory.name,
+                        label = {
+                            Text("Cost category name")
+                        },
+                        onValueChange = {
+                            onChangeCategoryName(costCategory.id, it)
+                        }
+                    )
+                },
+                trailingContent = {
+                    IconButton(
+                        onClick = {
+                            onClickDeleteCostCategory(costCategory)
+                        }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
                 }
             )
 
@@ -178,7 +216,7 @@ fun PlanEditScreen(
                     Icon(Icons.Default.Add, contentDescription = null)
                 },
                 headlineContent = {
-                    Text("Add ${costCategory.name} cost")
+                    Text("Add cost to: ${costCategory.name}")
                 }
             )
 

@@ -39,7 +39,7 @@ class PlanListViewModel(
                     onClick = {
                         _navCommandFlow.tryEmit(
                             NavCommand.Navigate(
-                                destination = PlanEditDest(id = "")
+                                destination = PlanEditDest(id = null)
                             )
                         )
                     }
