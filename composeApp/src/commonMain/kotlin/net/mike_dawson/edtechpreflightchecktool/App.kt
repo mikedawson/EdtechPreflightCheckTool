@@ -36,6 +36,7 @@ import net.mike_dawson.edtechpreflightchecktool.app.AppUiState
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.app.PreflightCheckHeader
 import net.mike_dawson.edtechpreflightchecktool.components.uiTextStringResource
+import net.mike_dawson.edtechpreflightchecktool.ui.theme.AppTheme
 
 @Composable
 @Preview
@@ -54,7 +55,7 @@ fun App() {
         mutableIntStateOf(0)
     }
 
-    MaterialTheme {
+    AppTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
                 //.safeContentPadding()
