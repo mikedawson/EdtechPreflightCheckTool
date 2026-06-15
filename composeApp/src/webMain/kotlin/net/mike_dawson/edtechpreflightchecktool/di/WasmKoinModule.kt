@@ -37,7 +37,10 @@ val wasmKoinModule = module {
     single<PlanDataSource> {
         PlanDataSource(
             settings = get(),
-            json = get()
+            json = get(),
+            examplePlansProvider = {
+                Res.readBytes("files/exampleplans.json").decodeToString()
+            }
         )
     }
 

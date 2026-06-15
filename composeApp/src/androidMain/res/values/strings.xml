@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EdtechPreflightCheckTool</string>
+    <string name="depreciation_note">Depreciation costs are calculated as straight line e.g. purchase cost plus disposal cost, divided by lifespan</string>
 </resources>

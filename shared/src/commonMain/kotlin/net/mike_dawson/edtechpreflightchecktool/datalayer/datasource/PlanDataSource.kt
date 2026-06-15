@@ -2,10 +2,15 @@ package net.mike_dawson.edtechpreflightchecktool.datalayer.datasource
 
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import kotlin.time.Clock
@@ -13,7 +18,26 @@ import kotlin.time.Clock
 class PlanDataSource(
     private val settings: Settings,
     private val json: Json,
+    private val examplePlansProvider: suspend () -> String = { "[]" },
+    scope: CoroutineScope = CoroutineScope(Dispatchers.Default + Job())
 ) {
+
+    init {
+        if(!settings.getBoolean(KEY_EXAMPLES_LOADED, false)) {
+            scope.launch {
+                val examplePlanJson = examplePlansProvider()
+                val examplePlans = json.decodeFromString(
+                    deserializer = ListSerializer(Plan.serializer()),
+                    string = examplePlanJson
+                )
+
+                examplePlans.forEach {
+                    store(it)
+                }
+                settings.putBoolean(KEY_EXAMPLES_LOADED, true)
+            }
+        }
+    }
 
     data class InvalidationCommand(
         val time: Long = Clock.System.now().toEpochMilliseconds()
@@ -30,7 +54,9 @@ class PlanDataSource(
     }
 
     fun store(plan: Plan) {
-        settings[KEY_ID_PREFIX + plan.id] = json.encodeToString(Plan.serializer(), plan)
+        settings[KEY_ID_PREFIX + plan.id] = json.encodeToString(Plan.serializer(), plan).also {
+            println(it)
+        }
         _invalidationFlow.tryEmit(InvalidationCommand())
     }
 
@@ -61,6 +87,8 @@ class PlanDataSource(
     companion object {
 
         const val KEY_ID_PREFIX = "plan_"
+
+        const val KEY_EXAMPLES_LOADED = "examples_loaded"
 
 
     }
