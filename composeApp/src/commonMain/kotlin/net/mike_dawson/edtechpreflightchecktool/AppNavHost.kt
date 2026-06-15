@@ -1,5 +1,6 @@
 package net.mike_dawson.edtechpreflightchecktool
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -9,6 +10,7 @@ import androidx.navigation.compose.composable
 import net.mike_dawson.edtechpreflightchecktool.app.AppUiState
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanListDest
 import net.mike_dawson.edtechpreflightchecktool.components.preflightViewModel
+import net.mike_dawson.edtechpreflightchecktool.nav.AboutDest
 import net.mike_dawson.edtechpreflightchecktool.nav.CostEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.InterventionEditDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanDetailDest
@@ -81,5 +83,8 @@ fun AppNavHost(
             )
         }
 
+        composable<AboutDest> {
+            Text("About")
+        }
     }
 }

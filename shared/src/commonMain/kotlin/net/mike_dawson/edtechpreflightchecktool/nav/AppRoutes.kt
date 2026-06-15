@@ -13,6 +13,9 @@ sealed interface PreflightAppDest
 object PlanListDest: PreflightAppDest
 
 @Serializable
+object AboutDest: PreflightAppDest
+
+@Serializable
 data class PlanEditDest(
     val id: String?,
 ): PreflightAppDest
