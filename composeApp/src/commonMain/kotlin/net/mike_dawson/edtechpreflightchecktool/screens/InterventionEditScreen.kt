@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import net.mike_dawson.edtechpreflightchecktool.components.defaultItemPadding
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Intervention
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.InterventionCategoryEnum
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.InterventionLicenseTypeEnum
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.RoiUnitEnum
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.InterventionEditUiState
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.InterventionEditViewModel
 
@@ -68,9 +70,22 @@ fun InterventionEditScreen(
             label = { Text("Category") }
         )
 
+        HorizontalDivider()
+
         Text(
             modifier = Modifier.fillMaxWidth().defaultItemPadding(),
-            text = "LAYS expected"
+            text = "Return on investment expected"
+        )
+
+        PreflightExposedDropDownMenuField(
+            modifier = Modifier.defaultItemPadding(),
+            value = uiState.intervention.roiUnit,
+            options = RoiUnitEnum.entries.toList(),
+            onOptionSelected = {
+                onChange(uiState.intervention.copy(roiUnit = it))
+            },
+            itemLabel = { it.displayName },
+            label = { Text("Unit") }
         )
 
         Row(
@@ -79,9 +94,9 @@ fun InterventionEditScreen(
         ){
             UstadNumberTextField(
                 modifier = Modifier.weight(1f).defaultItemPadding(),
-                value = uiState.intervention.laysFrom,
+                value = uiState.intervention.roiFrom,
                 onValueChange = {
-                    onChange(uiState.intervention.copy(laysFrom = it))
+                    onChange(uiState.intervention.copy(roiFrom = it))
                 }
             )
 
@@ -89,13 +104,15 @@ fun InterventionEditScreen(
 
             UstadNumberTextField(
                 modifier = Modifier.weight(1f).defaultItemPadding(),
-                value = uiState.intervention.laysTo,
+                value = uiState.intervention.roiTo,
                 onValueChange = {
-                    onChange(uiState.intervention.copy(laysTo = it))
+                    onChange(uiState.intervention.copy(roiTo = it))
                 }
             )
 
         }
+
+        HorizontalDivider()
 
         PreflightExposedDropDownMenuField(
             modifier = Modifier.fillMaxWidth().defaultItemPadding(),

@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -112,7 +113,7 @@ fun PlanDetailScreen(
                 }
             }
 
-            uiState.laysTotal?.also { laysTotal ->
+            uiState.roiTotals.takeIf { it.isNotEmpty() }?.also { roiTotals ->
                 item {
                     Box(
                         modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -126,11 +127,16 @@ fun PlanDetailScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.padding(16.dp).width(512.dp),
                             ) {
-                                Text("LAYS")
-                                Text(
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    text = "${laysTotal.laysFromPer100Currency.toDisplayString()}-${laysTotal.laysToPer100Currency.toDisplayString()} per 100 $currencySymbol $currencyCode",
-                                )
+                                Text("Expected Return on Investment Ranges")
+                                roiTotals.forEach { roiTotal ->
+                                    Text(
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        text = "${roiTotal.roiFromPer100Currency.toDisplayString()}-${roiTotal.roiToPer100Currency.toDisplayString()} per 100 $currencySymbol $currencyCode",
+                                    )
+                                    Text(roiTotal.unit.displayName)
+                                    HorizontalDivider()
+                                    Spacer(Modifier.height(16.dp))
+                                }
                             }
                         }
                     }
@@ -159,7 +165,7 @@ fun PlanDetailScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
-                                Text("LAYS: ${intervention.laysFrom} to ${intervention.laysTo}")
+                                Text("Return on investment: ${intervention.roiUnit.displayName}: ${intervention.roiFrom} to ${intervention.roiTo}")
                                 Text("License: ${intervention.licenseType.displayName}")
                             }
                         },

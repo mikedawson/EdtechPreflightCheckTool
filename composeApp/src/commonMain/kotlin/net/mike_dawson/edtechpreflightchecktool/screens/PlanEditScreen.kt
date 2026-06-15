@@ -152,7 +152,7 @@ fun PlanEditScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Text("LAYS: ${intervention.laysFrom} to ${intervention.laysTo}")
+                        Text("Return on investment: ${intervention.roiUnit.displayName}: ${intervention.roiFrom} to ${intervention.roiTo}")
                         Text("License: ${intervention.licenseType.displayName}")
                     }
                 },

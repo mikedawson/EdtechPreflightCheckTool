@@ -7,8 +7,9 @@ import kotlin.uuid.Uuid
 data class Intervention(
     val id: String = Uuid.random().toString(),
     val name: String = "",
-    val laysFrom: Float = 1f,
-    val laysTo: Float = 2f,
+    val roiFrom: Float = 1f,
+    val roiTo: Float = 2f,
+    val roiUnit: RoiUnitEnum = RoiUnitEnum.YEARS_OF_SCHOOLING,
     val licenseType: InterventionLicenseTypeEnum = InterventionLicenseTypeEnum.PROPRIETARY,
     val category: InterventionCategoryEnum = InterventionCategoryEnum.DPL,
     val inCountrySupported: Boolean = false,

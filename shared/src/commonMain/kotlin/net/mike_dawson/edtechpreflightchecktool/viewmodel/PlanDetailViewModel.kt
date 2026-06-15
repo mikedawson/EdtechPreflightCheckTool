@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostTotals
-import net.mike_dawson.edtechpreflightchecktool.datalayer.model.LaysTotal
+import net.mike_dawson.edtechpreflightchecktool.datalayer.model.RoiTotal
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import net.mike_dawson.edtechpreflightchecktool.ext.asUiText
 import net.mike_dawson.edtechpreflightchecktool.ext.getAnnualTotals
@@ -23,7 +23,7 @@ import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 data class PlanDetailUiState(
     val plan: Plan? = null,
     val costTotals: Map<String, CostTotals> = emptyMap(),
-    val laysTotal: LaysTotal? = null,
+    val roiTotals: List<RoiTotal> = emptyList(),
     val collapsedSectionIds: Set<String> = emptySet(),
 )
 
@@ -78,22 +78,24 @@ class PlanDetailViewModel(
                     }
                     val grandTotals = costTotalMap[ID_TOTAL] ?: throw IllegalStateException("Uh, what?")
 
-                    val laysFromTotal = plan.interventions.sumOf { it.laysFrom.toDouble() }.toFloat()
-                    val laysToTotal = plan.interventions.sumOf { it.laysTo.toDouble() }.toFloat()
+                    val roiTotals = plan.interventions.groupBy {
+                        it.roiUnit
+                    }.map { roiType ->
+                        val roiFrom = roiType.value.sumOf { it.roiFrom.toDouble() }.toFloat()
+                        val roiTo = roiType.value.sumOf { it.roiTo.toDouble()}.toFloat()
+                        RoiTotal(
+                            unit = roiType.key,
+                            from = roiFrom,
+                            to = roiTo,
+                            roiFromPerCurrency = roiFrom / grandTotals.totalCostPerStudent,
+                            roiToPerCurrency = roiTo / grandTotals.totalCostPerStudent,
+                        )
+                    }
 
                     _uiState.update { prev ->
                         prev.copy(
                             costTotals = costTotalMap,
-                            laysTotal = if(laysFromTotal != 0f && laysToTotal != 0f) {
-                                LaysTotal(
-                                    from = laysFromTotal,
-                                    to = laysToTotal,
-                                    laysFromPerCurrency = laysFromTotal / grandTotals.totalCostPerStudent,
-                                    laysToPerCurrency = laysToTotal / grandTotals.totalCostPerStudent
-                                )
-                            }else {
-                                null
-                            }
+                            roiTotals = roiTotals
                         )
                     }
                 }
