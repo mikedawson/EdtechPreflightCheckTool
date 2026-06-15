@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -214,6 +217,15 @@ fun CostEditScreen(
                         Text("Disposal cost (${uiState.currency})")
                     }
                 )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.defaultItemPadding()
+                ) {
+                    Icon(Icons.Outlined.Info, null)
+                    Spacer(Modifier.width(16.dp))
+                    Text("Depreciation costs are calculated as straight line e.g. purchase cost plus disposal cost, divided by lifespan")
+                }
             }
         }
 
