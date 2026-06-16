@@ -22,17 +22,17 @@ fun CostTotalsColumn(
     ) {
         Text(
             modifier = Modifier.width(256.dp),
-            text = "$currencySymbol ${totals.totalCost.toDisplayString()}/yr",
+            text = "${totals.totalCost.toDisplayString(currencySymbol = currencySymbol)}/yr",
             style = MaterialTheme.typography.bodyMediumEmphasized,
             textAlign = TextAlign.Right,
         )
         Text(
-            "Marginal cost/student/year: $currencySymbol ${totals.totalMarginalCostPerStudent.toDisplayString()}",
+            "Marginal cost/student/year: ${totals.totalMarginalCostPerStudent.toDisplayString(currencySymbol =  currencySymbol)}",
             modifier = Modifier.width(256.dp),
             textAlign = TextAlign.Right,
         )
         Text(
-            "Cost/student/year: $currencySymbol ${totals.totalCostPerStudent.toDisplayString()}",
+            "Cost/student/year: ${totals.totalCostPerStudent.toDisplayString(currencySymbol =  currencySymbol)}",
             modifier = Modifier.width(256.dp),
             textAlign = TextAlign.Right,
         )

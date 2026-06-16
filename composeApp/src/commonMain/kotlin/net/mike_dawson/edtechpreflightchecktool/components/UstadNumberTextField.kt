@@ -24,13 +24,35 @@ fun Float.roundTo(decimalPlaces: Int = 0): Float {
  * Remove the decimal point if this float has nothing after the decimal point.
  */
 fun Float.toDisplayString(
-    decimalPlaces: Int = 2
+    decimalPlaces: Int = 2,
+    padZeros: Boolean = true,
+    currencySymbol: String? = null,
 ): String {
     val strVal = toString()
-    return if(round(this) == this) {
-        strVal.substringBefore('.')
-    }else {
-        this.roundTo(decimalPlaces).toString().removeSuffix("0")
+    val thisFloat = this
+
+    return buildString {
+        currencySymbol?.also {
+            append("$it ")
+        }
+
+        append(
+            if(round(thisFloat) == thisFloat) {
+                strVal.substringBefore('.')
+            }else {
+                thisFloat.roundTo(decimalPlaces).toString().let {
+                    val subStrAfterPoint = it.substringAfter('.')
+                    if(padZeros && subStrAfterPoint.length != decimalPlaces) {
+                        it.padEnd(
+                            length = (it.length + (decimalPlaces - subStrAfterPoint.length)),
+                            padChar = '0'
+                        )
+                    }else {
+                        it
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -58,7 +80,10 @@ fun UstadNumberTextField(
     unsetDefault: Float = 0f,
     singleLine: Boolean = true,
 ) {
-    fun Float.numberString() = if(this == unsetDefault) "" else toDisplayString()
+    fun Float.numberString() = if(this == unsetDefault)
+        ""
+    else
+        toDisplayString(padZeros = false)
 
     var rawValue by remember {
         mutableStateOf(value.numberString())

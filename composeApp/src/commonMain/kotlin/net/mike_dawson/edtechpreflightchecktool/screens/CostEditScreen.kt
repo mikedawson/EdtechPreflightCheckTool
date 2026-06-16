@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import net.mike_dawson.edtechpreflightchecktool.components.CostAmountRangeField
 import net.mike_dawson.edtechpreflightchecktool.components.PreflightExposedDropDownMenuField
 import net.mike_dawson.edtechpreflightchecktool.components.UstadNumberTextField
 import net.mike_dawson.edtechpreflightchecktool.components.defaultItemPadding
@@ -127,11 +128,11 @@ fun CostEditScreen(
             ) {
                 val isUnitBased = cost.costBasis.isUnitBased
 
-                UstadNumberTextField(
+                CostAmountRangeField(
                     modifier = Modifier
                         .let {
                             if(isUnitBased) {
-                                it.width(128.dp)
+                                it.width(200.dp)
                                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                             } else {
                                 it.fillMaxWidth()
@@ -207,7 +208,7 @@ fun CostEditScreen(
                     )
                 }
 
-                UstadNumberTextField(
+                CostAmountRangeField(
                     modifier = Modifier.fillMaxWidth().defaultItemPadding(),
                     value = cost.assetDisposalCost,
                     onValueChange = {

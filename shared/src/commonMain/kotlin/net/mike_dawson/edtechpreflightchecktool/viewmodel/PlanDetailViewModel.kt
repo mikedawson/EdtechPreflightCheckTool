@@ -87,8 +87,8 @@ class PlanDetailViewModel(
                             unit = roiType.key,
                             from = roiFrom,
                             to = roiTo,
-                            roiFromPerCurrency = roiFrom / grandTotals.totalCostPerStudent,
-                            roiToPerCurrency = roiTo / grandTotals.totalCostPerStudent,
+                            roiFromPerCurrency = roiFrom / grandTotals.totalCostPerStudent.from,
+                            roiToPerCurrency = roiTo / grandTotals.totalCostPerStudent.to,
                         )
                     }
 

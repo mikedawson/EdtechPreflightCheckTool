@@ -97,17 +97,23 @@ fun PlanDetailScreen(
                     uiState.costTotals[PlanDetailViewModel.ID_TOTAL]?.also { grandTotals ->
                         InfoCard(
                             headlineText = "Total cost/year",
-                            contentText = "$currencySymbol ${grandTotals.totalCost.toDisplayString()}"
+                            contentText = grandTotals.totalCost.toDisplayString(
+                                currencySymbol = currencySymbol
+                            )
                         )
 
                         InfoCard(
                             headlineText = "Marginal cost/student/year",
-                            contentText = "$currencySymbol ${grandTotals.totalMarginalCostPerStudent.toDisplayString()}"
+                            contentText = grandTotals.totalMarginalCostPerStudent.toDisplayString(
+                                currencySymbol = currencySymbol
+                            )
                         )
 
                         InfoCard(
                             headlineText = "Total cost/student/year",
-                            contentText = "$currencySymbol ${grandTotals.totalCostPerStudent.toDisplayString()}"
+                            contentText = grandTotals.totalCostPerStudent.toDisplayString(
+                                currencySymbol = currencySymbol
+                            )
                         )
                     }
                 }

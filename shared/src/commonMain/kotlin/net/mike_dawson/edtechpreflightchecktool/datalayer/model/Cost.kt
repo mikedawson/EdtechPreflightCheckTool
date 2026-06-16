@@ -13,9 +13,8 @@ data class Cost(
     val recurrencePeriodDurationUnit : PreflightDateTimePeriodEnum = PreflightDateTimePeriodEnum.YEAR,
     val costBasis: CostBasisEnum = CostBasisEnum.PER_STUDENT,
     val costBasisPerNum: Float = 1f,
-    val costAmount: Float = 1f,
+    val costAmount: CostAmountRange = CostAmountRange(1f, 2f),
     val assetLifespanQuantity: Float = 4f,
     val assetLifespanUnit: PreflightDateTimePeriodEnum = PreflightDateTimePeriodEnum.YEAR,
-    val assetDisposalCost: Float = 0f,
-) {
-}
+    val assetDisposalCost: CostAmountRange = CostAmountRange(0f, 0f),
+)
