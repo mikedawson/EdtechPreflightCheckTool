@@ -86,7 +86,7 @@ class PlanDataSource(
 
     companion object {
 
-        const val KEY_ID_PREFIX = "plan_"
+        const val KEY_ID_PREFIX = "plan2_"
 
         const val KEY_EXAMPLES_LOADED = "examples_loaded"
 
