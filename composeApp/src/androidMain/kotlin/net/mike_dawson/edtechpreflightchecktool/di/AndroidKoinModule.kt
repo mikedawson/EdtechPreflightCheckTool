@@ -9,6 +9,7 @@ import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.CurrencyDat
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.nav.NavResultReturner
 import net.mike_dawson.edtechpreflightchecktool.nav.NavResultReturnerImpl
+import net.mike_dawson.edtechpreflightchecktool.viewmodel.AboutViewModel
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.CostEditViewModel
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.InterventionEditViewModel
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailViewModel
@@ -26,6 +27,7 @@ val androidKoinModule = module {
     viewModelOf(::PlanDetailViewModel)
     viewModelOf(::CostEditViewModel)
     viewModelOf(::InterventionEditViewModel)
+    viewModelOf(::AboutViewModel)
 
     single<Settings> {
         SharedPreferencesSettings(
