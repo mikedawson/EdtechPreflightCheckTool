@@ -20,6 +20,22 @@ fun Float.roundTo(decimalPlaces: Int = 0): Float {
     return ((this * factor).roundToInt() / factor).toFloat()
 }
 
+fun Float.toPercentString() : String {
+    return (this * 100).roundToInt().toString()
+}
+
+fun toFromPercentStr(from: Float?, to: Float?): String {
+    if(from == null || to == null) {
+        return ""
+    }
+
+    if(from < to) {
+        return "${from.toPercentString()}-${to.toPercentString()}%"
+    }else {
+        return "${to.toPercentString()}-${from.toPercentString()}%"
+    }
+}
+
 /**
  * Remove the decimal point if this float has nothing after the decimal point.
  */

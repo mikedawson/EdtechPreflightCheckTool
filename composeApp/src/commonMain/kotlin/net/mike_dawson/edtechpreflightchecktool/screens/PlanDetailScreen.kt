@@ -53,6 +53,7 @@ import net.mike_dawson.edtechpreflightchecktool.components.InfoCard
 import net.mike_dawson.edtechpreflightchecktool.components.defaultItemPadding
 import net.mike_dawson.edtechpreflightchecktool.components.formatCost
 import net.mike_dawson.edtechpreflightchecktool.components.toDisplayString
+import net.mike_dawson.edtechpreflightchecktool.components.toFromPercentStr
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailUiState
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailViewModel
 
@@ -297,6 +298,8 @@ fun PlanDetailScreen(
                 val isCollapsed = category.id in uiState.collapsedSectionIds
 
                 item {
+                    val totals = uiState.costTotals[category.id]
+
                     ListItem(
                         modifier = Modifier.clickable {
                             onToggleSectionIdCollapse(category.id)
@@ -310,14 +313,24 @@ fun PlanDetailScreen(
                         },
                         headlineContent = { Text(category.name) },
                         supportingContent = {
-                            if(!isExpandedLayout) {
-                                uiState.costTotals[category.id]?.also { totals ->
-                                    CostTotalsColumn(
-                                        currencySymbol = currencySymbol,
-                                        totals = totals
-                                    )
+                            Column {
+                                if(!isExpandedLayout) {
+                                    totals?.also { _ ->
+                                        CostTotalsColumn(
+                                            currencySymbol = currencySymbol,
+                                            totals = totals
+                                        )
+
+                                        Spacer(Modifier.height(8.dp))
+                                    }
+                                }
+
+                                totals?.percentageOfTotalTo?.also {
+                                    Text("${toFromPercentStr(totals.percentageOfTotalFrom, totals.percentageOfTotalTo)} total cost, " +
+                                            "${toFromPercentStr(totals.percentageOfTotalMarginalFrom, totals.percentageOfTotalMarginalTo)} marginal cost per student")
                                 }
                             }
+
                         },
                         trailingContent = {
                             Row {

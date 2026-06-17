@@ -101,12 +101,39 @@ class PlanDetailViewModel(
                         val totalsPerCategory = plan.costCategories.map { category ->
                             val costsForCategory = category.costs.map { it.getAnnualTotals(plan) }
                             putAll(costsForCategory.associateBy { it.forId })
-                            costsForCategory.sumCostTotals(category.id).also {
-                                put(category.id, it)
-                            }
+                            costsForCategory.sumCostTotals(category.id)
                         }
 
-                        put(ID_TOTAL, totalsPerCategory.sumCostTotals(ID_TOTAL))
+
+                        val totalSum = totalsPerCategory.sumCostTotals(ID_TOTAL)
+                        put(ID_TOTAL, totalSum)
+
+                        putAll(
+                            totalsPerCategory.associate { category ->
+                                category.forId to category.copy(
+                                    percentageOfTotalTo = if(totalSum.totalCost.to != 0f) {
+                                        category.totalCost.to / totalSum.totalCost.to
+                                    }else{
+                                        null
+                                    },
+                                    percentageOfTotalFrom = if(totalSum.totalCost.from != 0f) {
+                                        category.totalCost.from / totalSum.totalCost.from
+                                    }else{
+                                        null
+                                    },
+                                    percentageOfTotalMarginalTo = if (totalSum.totalMarginalCostPerStudent.to != 0f) {
+                                        category.totalMarginalCostPerStudent.to / totalSum.totalMarginalCostPerStudent.to
+                                    }else {
+                                        null
+                                    },
+                                    percentageOfTotalMarginalFrom = if (totalSum.totalMarginalCostPerStudent.from != 0f) {
+                                        category.totalMarginalCostPerStudent.from / totalSum.totalMarginalCostPerStudent.from
+                                    }else {
+                                        null
+                                    },
+                                )
+                            }
+                        )
                     }
                     val grandTotals = costTotalMap[ID_TOTAL] ?: throw IllegalStateException("Uh, what?")
 
@@ -124,6 +151,7 @@ class PlanDetailViewModel(
                         )
                     }
 
+                    println(costTotalMap)
                     _uiState.update { prev ->
                         prev.copy(
                             costTotals = costTotalMap,
