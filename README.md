@@ -64,6 +64,14 @@ in your IDE's toolbar or run it directly from the terminal:
 
 ---
 
+### Deploying
+
+Only the Wasm browser based version is used/tested. It can be built by:
+```shell
+./gradlew composeApp:wasmJsBrowserDistribution
+```
+Then copy the files from composeApp/build/dist to any http server.
+
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
 [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
 [Kotlin/Wasm](https://kotl.in/wasm/)…

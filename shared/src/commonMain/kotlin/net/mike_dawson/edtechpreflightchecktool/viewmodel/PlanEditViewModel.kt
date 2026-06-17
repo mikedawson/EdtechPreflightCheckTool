@@ -54,7 +54,8 @@ class PlanEditViewModel(
                     visible = true,
                     text = "Save".asUiText(),
                     onClick = ::onClickSave,
-                )
+                ),
+                hideBottomBar = true,
             )
         }
 

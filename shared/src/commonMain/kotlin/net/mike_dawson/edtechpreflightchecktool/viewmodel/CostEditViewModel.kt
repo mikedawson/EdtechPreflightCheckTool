@@ -46,7 +46,8 @@ class CostEditViewModel(
                     text = "Done".asUiText(),
                     enabled = true,
                     onClick = ::onClickDone
-                )
+                ),
+                hideBottomBar = true,
             )
         }
     }

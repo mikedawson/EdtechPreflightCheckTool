@@ -41,7 +41,8 @@ class InterventionEditViewModel(
                     text = "Done".asUiText(),
                     enabled = true,
                     onClick = ::onClickDone
-                )
+                ),
+                hideBottomBar = true,
             )
         }
     }

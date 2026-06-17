@@ -6,4 +6,5 @@ data class AppUiState(
     val showBackButton: Boolean? = null,
     val actionBarButtonState: ActionBarButtonUiState = ActionBarButtonUiState(),
     val overflowOptions: List<OverflowActionBarItem> = emptyList(),
+    val hideBottomBar: Boolean = false,
 )
