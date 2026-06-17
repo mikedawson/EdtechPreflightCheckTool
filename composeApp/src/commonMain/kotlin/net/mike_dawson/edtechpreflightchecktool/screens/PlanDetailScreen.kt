@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Receipt
@@ -35,13 +36,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.Dispatchers
 import net.mike_dawson.edtechpreflightchecktool.components.CostTotalsColumn
 import net.mike_dawson.edtechpreflightchecktool.components.InfoCard
@@ -163,6 +167,10 @@ fun PlanDetailScreen(
     val currencySymbol = uiState.plan?.currency?.symbol?: ""
     val currencyCode = uiState.plan?.currency?.code ?: ""
     val plan = uiState.plan
+
+    val isExpandedLayout = currentWindowAdaptiveInfo().windowSizeClass.isWidthAtLeastBreakpoint(
+        WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
+    )
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
@@ -289,14 +297,31 @@ fun PlanDetailScreen(
                         modifier = Modifier.clickable {
                             onToggleSectionIdCollapse(category.id)
                         },
+                        leadingContent = {
+                            Icon(Icons.AutoMirrored.Outlined.Label, null)
+                        },
                         headlineContent = { Text(category.name) },
-                        trailingContent = {
-                            Row {
+                        supportingContent = {
+                            if(!isExpandedLayout) {
                                 uiState.costTotals[category.id]?.also { totals ->
                                     CostTotalsColumn(
                                         currencySymbol = currencySymbol,
                                         totals = totals
                                     )
+                                }
+                            }
+                        },
+                        trailingContent = {
+                            Row {
+                                if(isExpandedLayout) {
+                                    uiState.costTotals[category.id]?.also { totals ->
+                                        CostTotalsColumn(
+                                            currencySymbol = currencySymbol,
+                                            totals = totals,
+                                            textAlign = TextAlign.End,
+                                            horizontalAlignment = Alignment.End,
+                                        )
+                                    }
                                 }
 
                                 IconButton(
@@ -335,13 +360,22 @@ fun PlanDetailScreen(
                             headlineContent = { Text(cost.name) },
                             supportingContent = {
                                 Text(formatCost(cost, plan.currency))
+
+                                if(!isExpandedLayout && totals != null) {
+                                    CostTotalsColumn(
+                                        currencySymbol = currencySymbol,
+                                        totals = totals,
+                                    )
+                                }
                             },
                             trailingContent = {
                                 Row {
-                                    if(totals != null) {
+                                    if(isExpandedLayout && totals != null) {
                                         CostTotalsColumn(
                                             currencySymbol = currencySymbol,
                                             totals = totals,
+                                            textAlign = TextAlign.End,
+                                            horizontalAlignment = Alignment.End,
                                         )
                                     }
 
