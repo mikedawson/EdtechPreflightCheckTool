@@ -60,6 +60,11 @@ class PlanDataSource(
         _invalidationFlow.tryEmit(InvalidationCommand())
     }
 
+    fun delete(plan: Plan) {
+        settings.remove(KEY_ID_PREFIX + plan.id)
+        _invalidationFlow.tryEmit(InvalidationCommand())
+    }
+
     fun get(id: String): Plan? {
         return settings.getStringOrNull(KEY_ID_PREFIX + id)?.let {
             json.decodeFromString(Plan.serializer(), it)

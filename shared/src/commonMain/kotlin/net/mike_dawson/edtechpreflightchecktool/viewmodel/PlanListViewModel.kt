@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.app.OverflowActionBarItem
+import net.mike_dawson.edtechpreflightchecktool.app.Snack
+import net.mike_dawson.edtechpreflightchecktool.app.SnackBarDispatcher
 import net.mike_dawson.edtechpreflightchecktool.app.StringUiText
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
@@ -25,6 +27,7 @@ class PlanListViewModel(
     savedStateHandle: SavedStateHandle,
     private val planDataSource: PlanDataSource,
     private val json: Json,
+    private val snackBarDispatcher: SnackBarDispatcher,
 ): BaseViewModel(savedStateHandle) {
 
     private val _uiState = MutableStateFlow(PlanListUiState())
@@ -73,8 +76,8 @@ class PlanListViewModel(
                 viewModelScope.launch {
                     planDataSource.store(plan)
                 }
-            }catch(e: Throwable) {
-                e.printStackTrace()
+            }catch(_: Throwable) {
+                snackBarDispatcher.showSnackBar(Snack("Error: invalid file"))
             }
         }
     }

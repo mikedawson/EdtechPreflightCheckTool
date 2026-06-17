@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.app.OverflowActionBarItem
+import net.mike_dawson.edtechpreflightchecktool.app.Snack
+import net.mike_dawson.edtechpreflightchecktool.app.SnackBarDispatcher
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostTotals
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.RoiTotal
@@ -21,6 +23,8 @@ import net.mike_dawson.edtechpreflightchecktool.ext.sumCostTotals
 import net.mike_dawson.edtechpreflightchecktool.nav.NavCommand
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanDetailDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
+import net.mike_dawson.edtechpreflightchecktool.nav.PlanListDest
+import kotlin.uuid.Uuid
 
 data class PlanDetailUiState(
     val plan: Plan? = null,
@@ -29,12 +33,16 @@ data class PlanDetailUiState(
     val collapsedSectionIds: Set<String> = emptySet(),
     val showExportDialog: Boolean = false,
     val exportFilename: String = "",
+    val copyDialogVisible: Boolean = false,
+    val copyPlanName: String = "",
+    val confirmDeleteDialogVisible: Boolean = false,
 )
 
 class PlanDetailViewModel(
     savedStateHandle: SavedStateHandle,
     private val dataSource: PlanDataSource,
     private val json: Json,
+    private val snackBarDispatcher: SnackBarDispatcher,
 ) : BaseViewModel(savedStateHandle) {
 
     private val routeDest: PlanDetailDest = savedStateHandle.toRoute()
@@ -75,6 +83,14 @@ class PlanDetailViewModel(
                             OverflowActionBarItem(
                                 text = "Export to file",
                                 onClick = this@PlanDetailViewModel::onClickSaveToFile,
+                            ),
+                            OverflowActionBarItem(
+                                text = "Make a copy",
+                                onClick = this@PlanDetailViewModel::onClickCopy,
+                            ),
+                            OverflowActionBarItem(
+                                text = "Delete",
+                                onClick = this@PlanDetailViewModel::onClickDelete,
                             )
                         )
                     )
@@ -142,6 +158,69 @@ class PlanDetailViewModel(
                 exportFilename = "${it.plan?.name}.txt",
             )
         }
+    }
+
+    fun onClickCopy() {
+        _uiState.update {
+            it.copy(
+                copyDialogVisible = true,
+                copyPlanName = "Copy of ${it.plan?.name ?: ""}",
+            )
+        }
+    }
+
+    fun onDismissCopyDialog() {
+        _uiState.update { it.copy(copyDialogVisible = false) }
+    }
+
+    fun onCopyPlanNameChanged(name: String) {
+        _uiState.update { it.copy(copyPlanName = name) }
+    }
+
+    fun onConfirmCopy() {
+        onDismissCopyDialog()
+        viewModelScope.launch {
+            val plan = _uiState.value.plan ?: return@launch
+            val newId = Uuid.random().toString()
+            dataSource.store(
+                plan.copy(
+                    id = newId,
+                    name = _uiState.value.copyPlanName,
+                )
+            )
+
+            _navCommandFlow.tryEmit(
+                NavCommand.Navigate(
+                    destination = PlanDetailDest(id = newId)
+                )
+            )
+
+            snackBarDispatcher.showSnackBar(Snack("Copied"))
+        }
+    }
+
+    fun onClickDelete() {
+        _uiState.update { it.copy(confirmDeleteDialogVisible = true) }
+    }
+
+    fun onDismissDeleteDialog() {
+        _uiState.update { it.copy(confirmDeleteDialogVisible = false) }
+    }
+
+    fun onClickConfirmDelete() {
+        onDismissDeleteDialog()
+        val plan = uiState.value.plan ?: return
+
+        dataSource.delete(plan)
+
+        _navCommandFlow.tryEmit(
+            NavCommand.Navigate(
+                destination = PlanListDest,
+                clearBackStack = true
+            )
+        )
+
+        snackBarDispatcher.showSnackBar(Snack("Plan deleted"))
     }
 
     fun onClickConfirmSaveToFile() {

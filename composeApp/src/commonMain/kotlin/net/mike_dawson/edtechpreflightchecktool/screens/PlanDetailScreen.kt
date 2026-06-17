@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,7 +35,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,64 +64,93 @@ fun PlanDetailScreen(
 
     if(uiState.showExportDialog) {
         //As per https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-basic-alert-dialog.html
-        BasicAlertDialog(
-            onDismissRequest = viewModel::onDismissExportDialog,
-            content = {
-                Surface(
-                    modifier = Modifier.widthIn(max = 300.dp).wrapContentHeight(),
-                    shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surface
+        FilenameAlertDialog(
+            onDismiss = viewModel::onDismissExportDialog,
+            filename = uiState.exportFilename,
+            onFilenameChanged = viewModel::onExportFilenameChanged,
+            textFieldLabel = {
+                Text("Filename")
+            },
+            confirmButton = {
+                Button(
+                    onClick = viewModel::onClickConfirmSaveToFile
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Text("Save")
+                }
+            },
+            infoContent = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Outlined.Info, contentDescription = null)
+                    Spacer(Modifier.width(16.dp))
+                    Text("After you download the text file to your device, you can import it on any other device by clicking the Planner tab and selecting the Import from file option from three dots in the top right corner")
+                }
+
+                Spacer(Modifier.height(24.dp))
+            }
+        )
+    }
+
+    if(uiState.copyDialogVisible) {
+        FilenameAlertDialog(
+            onDismiss = viewModel::onDismissCopyDialog,
+            filename = uiState.copyPlanName,
+            onFilenameChanged = viewModel::onCopyPlanNameChanged,
+            textFieldLabel = {
+                Text("Name*")
+            },
+            confirmButton = {
+                Button(
+                    onClick = viewModel::onConfirmCopy
+                ) {
+                    Text("Make a copy")
+                }
+            },
+        )
+    }
+
+    if(uiState.confirmDeleteDialogVisible) {
+        BasicAlertDialog(
+            onDismissRequest = viewModel::onDismissDeleteDialog,
+        ) {
+            Surface(
+                modifier = Modifier.widthIn(max = 300.dp).wrapContentHeight(),
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Are you sure you want to delete this plan? This is permanent.")
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = uiState.exportFilename,
-                            onValueChange = viewModel::onExportFilenameChanged,
-                            label = {
-                                Text("Filename")
+                        TextButton(
+                            onClick = {
+                                viewModel.onDismissDeleteDialog()
                             }
-                        )
-
-                        Spacer(Modifier.height(24.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Outlined.Info, contentDescription = null)
-                            Spacer(Modifier.width(16.dp))
-                            Text("After you download the text file to your device, you can import it on any other device by clicking the Planner tab and selecting the Import from file option from three dots in the top right corner")
+                            Text("Cancel")
                         }
 
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.width(16.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                        Button(
+                            onClick = {
+                                viewModel.onClickConfirmDelete()
+                            }
                         ) {
-                            TextButton(
-                                onClick = {
-                                    viewModel.onDismissExportDialog()
-                                }
-                            ) {
-                                Text("Cancel")
-                            }
-
-                            TextButton(
-                                onClick =  {
-                                    viewModel.onClickConfirmSaveToFile()
-                                }
-                            ) {
-                                Text("Download")
-                            }
+                            Text("Delete")
                         }
                     }
                 }
             }
-        )
+        }
     }
 }
 

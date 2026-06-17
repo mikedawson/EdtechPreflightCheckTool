@@ -17,9 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import kotlinx.coroutines.flow.collectLatest
 import net.mike_dawson.edtechpreflightchecktool.app.AppUiState
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
 import net.mike_dawson.edtechpreflightchecktool.app.PreflightCheckHeader
+import net.mike_dawson.edtechpreflightchecktool.app.SnackBarFlowDispatcher
 import net.mike_dawson.edtechpreflightchecktool.components.uiTextStringResource
 import net.mike_dawson.edtechpreflightchecktool.ui.theme.AppTheme
+import org.koin.compose.getKoin
 
 @Composable
 @Preview
@@ -55,6 +61,16 @@ fun App() {
         mutableIntStateOf(0)
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val koin = getKoin()
+
+    LaunchedEffect(Unit) {
+        koin.get<SnackBarFlowDispatcher>().snackFlow.collectLatest {
+            snackbarHostState.showSnackbar(it.message, it.action)
+        }
+    }
+
     AppTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
@@ -62,7 +78,11 @@ fun App() {
                 .fillMaxSize(),
             color = MaterialTheme.colorScheme.background,
         ) {
-            Scaffold() { innerPadding ->
+            Scaffold(
+                snackbarHost = {
+                    SnackbarHost(snackbarHostState)
+                },
+            ) { innerPadding ->
                 Row(
                     modifier = Modifier.fillMaxSize().consumeWindowInsets(innerPadding)
                 ) {

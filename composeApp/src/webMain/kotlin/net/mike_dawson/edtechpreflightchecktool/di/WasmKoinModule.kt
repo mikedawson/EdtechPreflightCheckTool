@@ -4,6 +4,8 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.StorageSettings
 import edtechpreflightchecktool.composeapp.generated.resources.Res
 import kotlinx.serialization.json.Json
+import net.mike_dawson.edtechpreflightchecktool.app.SnackBarDispatcher
+import net.mike_dawson.edtechpreflightchecktool.app.SnackBarFlowDispatcher
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.CurrencyDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.nav.NavResultReturner
@@ -55,5 +57,13 @@ val wasmKoinModule = module {
 
     single<NavResultReturner> {
         NavResultReturnerImpl()
+    }
+
+    single<SnackBarFlowDispatcher> {
+        SnackBarFlowDispatcher()
+    }
+
+    single<SnackBarDispatcher> {
+        get<SnackBarFlowDispatcher>()
     }
 }
