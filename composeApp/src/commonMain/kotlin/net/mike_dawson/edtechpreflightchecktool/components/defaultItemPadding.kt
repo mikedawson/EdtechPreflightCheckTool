@@ -1,6 +1,7 @@
 package net.mike_dawson.edtechpreflightchecktool.components
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -15,3 +16,5 @@ fun Modifier.defaultItemPadding(
     end: Dp = 16.dp,
     bottom: Dp = 8.dp,
 ): Modifier = padding(start = start, top = top, end = end, bottom = bottom)
+
+fun Modifier.defaultAvatarSize() = size(40.dp)

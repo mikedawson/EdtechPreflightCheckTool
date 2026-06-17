@@ -48,7 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.Dispatchers
 import net.mike_dawson.edtechpreflightchecktool.components.CostTotalsColumn
+import net.mike_dawson.edtechpreflightchecktool.components.IconColorCircle
 import net.mike_dawson.edtechpreflightchecktool.components.InfoCard
+import net.mike_dawson.edtechpreflightchecktool.components.defaultItemPadding
 import net.mike_dawson.edtechpreflightchecktool.components.formatCost
 import net.mike_dawson.edtechpreflightchecktool.components.toDisplayString
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailUiState
@@ -270,7 +272,9 @@ fun PlanDetailScreen(
                 item {
                     ListItem(
                         leadingContent = {
-                            Icon(Icons.AutoMirrored.Filled.ListAlt, contentDescription = null)
+                            IconColorCircle(name = intervention.name) {
+                                Icon(Icons.AutoMirrored.Filled.ListAlt, contentDescription = null)
+                            }
                         },
                         headlineContent = {
                             Text(intervention.name)
@@ -298,7 +302,11 @@ fun PlanDetailScreen(
                             onToggleSectionIdCollapse(category.id)
                         },
                         leadingContent = {
-                            Icon(Icons.AutoMirrored.Outlined.Label, null)
+                            IconColorCircle(
+                                name = category.name
+                            ) {
+                                Icon(Icons.AutoMirrored.Outlined.Label, null)
+                            }
                         },
                         headlineContent = { Text(category.name) },
                         supportingContent = {
@@ -346,47 +354,63 @@ fun PlanDetailScreen(
                     )
                 }
 
-                category.costs.takeIf { !isCollapsed }?.forEach { cost ->
-                    val totals = uiState.costTotals[cost.id]
+                if(!isCollapsed) {
+                    category.costs.forEach { cost ->
+                        val totals = uiState.costTotals[cost.id]
 
-                    item {
-                        ListItem(
-                            leadingContent = {
-                                Icon(
-                                    Icons.Default.Receipt,
-                                    contentDescription = null,
-                                )
-                            },
-                            headlineContent = { Text(cost.name) },
-                            supportingContent = {
-                                Text(formatCost(cost, plan.currency))
+                        item {
+                            ListItem(
+                                leadingContent = {
+                                    IconColorCircle(
+                                        name = cost.name
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Receipt,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                                headlineContent = { Text(cost.name) },
+                                supportingContent = {
+                                    Text(formatCost(cost, plan.currency))
 
-                                if(!isExpandedLayout && totals != null) {
-                                    CostTotalsColumn(
-                                        currencySymbol = currencySymbol,
-                                        totals = totals,
-                                    )
-                                }
-                            },
-                            trailingContent = {
-                                Row {
-                                    if(isExpandedLayout && totals != null) {
+                                    if(!isExpandedLayout && totals != null) {
                                         CostTotalsColumn(
                                             currencySymbol = currencySymbol,
                                             totals = totals,
-                                            textAlign = TextAlign.End,
-                                            horizontalAlignment = Alignment.End,
                                         )
                                     }
+                                },
+                                trailingContent = {
+                                    Row {
+                                        if(isExpandedLayout && totals != null) {
+                                            CostTotalsColumn(
+                                                currencySymbol = currencySymbol,
+                                                totals = totals,
+                                                textAlign = TextAlign.End,
+                                                horizontalAlignment = Alignment.End,
+                                            )
+                                        }
 
-                                    IconButton(
-                                        onClick = { }
-                                    ) {
-                                        Icon(Icons.Outlined.Info, contentDescription = "Info")
+                                        IconButton(
+                                            onClick = { }
+                                        ) {
+                                            Icon(Icons.Outlined.Info, contentDescription = "Info")
+                                        }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
+                    }
+
+                    if(category.costs.isEmpty()) {
+                        item {
+                            Text(
+                                "[No costs in this category]",
+                                modifier = Modifier.fillMaxWidth().defaultItemPadding(),
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
             }

@@ -1,10 +1,14 @@
 package net.mike_dawson.edtechpreflightchecktool.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,9 +24,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import edtechpreflightchecktool.composeapp.generated.resources.Res
+import edtechpreflightchecktool.composeapp.generated.resources.nodata
 import net.mike_dawson.edtechpreflightchecktool.components.PreflightExposedDropDownMenuField
 import net.mike_dawson.edtechpreflightchecktool.components.UstadNumberTextField
 import net.mike_dawson.edtechpreflightchecktool.components.defaultItemPadding
@@ -33,6 +41,7 @@ import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Intervention
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanEditUiState
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanEditViewModel
+import org.jetbrains.compose.resources.imageResource
 
 @Composable
 fun PlanEditScreen(
@@ -166,6 +175,27 @@ fun PlanEditScreen(
                     }
                 }
             )
+        }
+
+        if(uiState.plan.interventions.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth().defaultItemPadding(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    bitmap = imageResource(Res.drawable.nodata),
+                    modifier = Modifier.size(128.dp),
+                    contentDescription = null,
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    "No interventions yet. Add an intervention to define expected return on investment e.g. learning improvements",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
 
         }
 
