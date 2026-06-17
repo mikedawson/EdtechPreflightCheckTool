@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
+import net.mike_dawson.edtechpreflightchecktool.app.OverflowActionBarItem
 import net.mike_dawson.edtechpreflightchecktool.app.StringUiText
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.Plan
@@ -22,6 +24,7 @@ data class PlanListUiState(
 class PlanListViewModel(
     savedStateHandle: SavedStateHandle,
     private val planDataSource: PlanDataSource,
+    private val json: Json,
 ): BaseViewModel(savedStateHandle) {
 
     private val _uiState = MutableStateFlow(PlanListUiState())
@@ -44,6 +47,12 @@ class PlanListViewModel(
                         )
                     }
                 ),
+                overflowOptions = listOf(
+                    OverflowActionBarItem(
+                        text = "Import from file",
+                        onClick = this@PlanListViewModel::onClickImportFromFile,
+                    ),
+                ),
                 showBackButton = false,
             )
         }
@@ -53,6 +62,19 @@ class PlanListViewModel(
                 _uiState.update { prev ->
                     prev.copy(plans = it)
                 }
+            }
+        }
+    }
+
+    fun onClickImportFromFile() {
+        openTextFile { text ->
+            try {
+                val plan: Plan = json.decodeFromString(Plan.serializer(), text)
+                viewModelScope.launch {
+                    planDataSource.store(plan)
+                }
+            }catch(e: Throwable) {
+                e.printStackTrace()
             }
         }
     }

@@ -5,4 +5,5 @@ data class AppUiState(
     val fabState: FabUiState = FabUiState(),
     val showBackButton: Boolean? = null,
     val actionBarButtonState: ActionBarButtonUiState = ActionBarButtonUiState(),
+    val overflowOptions: List<OverflowActionBarItem> = emptyList(),
 )

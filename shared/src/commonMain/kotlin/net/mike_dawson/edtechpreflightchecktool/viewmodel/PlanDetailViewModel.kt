@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import net.mike_dawson.edtechpreflightchecktool.app.FabUiState
+import net.mike_dawson.edtechpreflightchecktool.app.OverflowActionBarItem
 import net.mike_dawson.edtechpreflightchecktool.datalayer.datasource.PlanDataSource
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostTotals
 import net.mike_dawson.edtechpreflightchecktool.datalayer.model.RoiTotal
@@ -25,11 +27,14 @@ data class PlanDetailUiState(
     val costTotals: Map<String, CostTotals> = emptyMap(),
     val roiTotals: List<RoiTotal> = emptyList(),
     val collapsedSectionIds: Set<String> = emptySet(),
+    val showExportDialog: Boolean = false,
+    val exportFilename: String = "",
 )
 
 class PlanDetailViewModel(
     savedStateHandle: SavedStateHandle,
     private val dataSource: PlanDataSource,
+    private val json: Json,
 ) : BaseViewModel(savedStateHandle) {
 
     private val routeDest: PlanDetailDest = savedStateHandle.toRoute()
@@ -62,6 +67,17 @@ class PlanDetailViewModel(
             dataSource.getAsFlow(routeDest.id).collect { plan ->
                 _uiState.update { prev ->
                     prev.copy(plan = plan)
+                }
+
+                _appUiState.update {
+                    it.copy(
+                        overflowOptions = listOf(
+                            OverflowActionBarItem(
+                                text = "Export to file",
+                                onClick = this@PlanDetailViewModel::onClickSaveToFile,
+                            )
+                        )
+                    )
                 }
 
                 if(plan != null) {
@@ -107,6 +123,35 @@ class PlanDetailViewModel(
                 }
             }
         }
+    }
+
+
+
+    fun onDismissExportDialog() {
+        _uiState.update { it.copy(showExportDialog = false) }
+    }
+
+    fun onExportFilenameChanged(filename: String) {
+        _uiState.update { it.copy(exportFilename = filename) }
+    }
+
+    fun onClickSaveToFile() {
+        _uiState.update {
+            it.copy(
+                showExportDialog = true,
+                exportFilename = "${it.plan?.name}.txt",
+            )
+        }
+    }
+
+    fun onClickConfirmSaveToFile() {
+        onDismissExportDialog()
+        val plan = uiState.value.plan ?: return
+        saveTextFile(
+            name = uiState.value.exportFilename,
+            text = json.encodeToString(Plan.serializer(), plan)
+        )
+
     }
 
     fun onToggleSectionIdCollapse(id: String) {

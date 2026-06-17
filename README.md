@@ -1,4 +1,15 @@
-This is a Kotlin Multiplatform project targeting Android, Web, Server.
+
+This is an EdTech "preflight check" cost calculator intended to make it quicker and easier to 
+estimate edtech intervention costs and likely return on investment.
+
+This is an early stage proof of concept software. It works and is provided in the hope that some 
+may find it useful.
+
+Developed by [Mike Dawson](https://www.linkedin.com/in/mikesdawson/), funded by and developed in 
+accordance with guidance from [EdTech Hub](https://www.edtechhub.org/).
+
+This is developed as a [Compose Multiplatform](https://kotlinlang.org/compose-multiplatform/) app using Kotlin. All data is stored locally (using
+browser storage on the web build and shared preferences on Android).
 
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
@@ -26,19 +37,6 @@ in your IDE’s toolbar or build it directly from the terminal:
 - on Windows
   ```shell
   .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Server
-
-To build and run the development version of the server, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :server:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :server:run
   ```
 
 ### Build and Run Web Application

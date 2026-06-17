@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ListAlt
@@ -19,15 +21,20 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import net.mike_dawson.edtechpreflightchecktool.components.CostTotalsColumn
 import net.mike_dawson.edtechpreflightchecktool.components.InfoCard
 import net.mike_dawson.edtechpreflightchecktool.components.formatCost
@@ -42,15 +50,79 @@ import net.mike_dawson.edtechpreflightchecktool.components.toDisplayString
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailUiState
 import net.mike_dawson.edtechpreflightchecktool.viewmodel.PlanDetailViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanDetailScreen(
     viewModel: PlanDetailViewModel,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState(Dispatchers.Main.immediate)
+
     PlanDetailScreen(
         uiState = uiState,
         onToggleSectionIdCollapse = viewModel::onToggleSectionIdCollapse,
     )
+
+    if(uiState.showExportDialog) {
+        //As per https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-basic-alert-dialog.html
+        BasicAlertDialog(
+            onDismissRequest = viewModel::onDismissExportDialog,
+            content = {
+                Surface(
+                    modifier = Modifier.widthIn(max = 300.dp).wrapContentHeight(),
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = uiState.exportFilename,
+                            onValueChange = viewModel::onExportFilenameChanged,
+                            label = {
+                                Text("Filename")
+                            }
+                        )
+
+                        Spacer(Modifier.height(24.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Outlined.Info, contentDescription = null)
+                            Spacer(Modifier.width(16.dp))
+                            Text("After you download the text file to your device, you can import it on any other device by clicking the Planner tab and selecting the Import from file option from three dots in the top right corner")
+                        }
+
+                        Spacer(Modifier.height(24.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    viewModel.onDismissExportDialog()
+                                }
+                            ) {
+                                Text("Cancel")
+                            }
+
+                            TextButton(
+                                onClick =  {
+                                    viewModel.onClickConfirmSaveToFile()
+                                }
+                            ) {
+                                Text("Download")
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
