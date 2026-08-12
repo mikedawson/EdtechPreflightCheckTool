@@ -13,7 +13,7 @@ import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostTotals
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CostTotalsColumn(
-    currencySymbol: String,
+    currencyCode: String,
     totals: CostTotals,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
@@ -24,16 +24,16 @@ fun CostTotalsColumn(
         horizontalAlignment = horizontalAlignment,
     ) {
         Text(
-            text = "${totals.totalCost.toDisplayString(currencySymbol = currencySymbol)}/yr",
+            text = "${totals.totalCost.toDisplayString(currencyCode = currencyCode)}/yr",
             style = MaterialTheme.typography.bodyMediumEmphasized,
             textAlign = textAlign
         )
         Text(
-            "Marginal cost/student/year: ${totals.totalMarginalCostPerStudent.toDisplayString(currencySymbol =  currencySymbol)}",
+            "Marginal cost/student/year ($currencyCode): ${totals.totalMarginalCostPerStudent.toDisplayString()}",
             textAlign = textAlign,
         )
         Text(
-            "Cost/student/year: ${totals.totalCostPerStudent.toDisplayString(currencySymbol =  currencySymbol)}",
+            "Cost/student/year ($currencyCode): ${totals.totalCostPerStudent.toDisplayString()}",
             textAlign = textAlign,
         )
     }

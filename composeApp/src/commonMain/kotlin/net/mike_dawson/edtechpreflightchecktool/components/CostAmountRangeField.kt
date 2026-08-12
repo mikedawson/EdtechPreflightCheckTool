@@ -13,10 +13,10 @@ import net.mike_dawson.edtechpreflightchecktool.datalayer.model.CostAmountRange
 
 fun CostAmountRange.toDisplayString(
     decimalPlaces: Int = 2,
-    currencySymbol: String? = null,
+    currencyCode: String? = null,
 ): String {
-    return "${from.toDisplayString(decimalPlaces, currencySymbol = currencySymbol)} to " +
-            to.toDisplayString(decimalPlaces, currencySymbol = currencySymbol)
+    return "${from.toDisplayString(decimalPlaces, currencyCode = currencyCode)} to " +
+            to.toDisplayString(decimalPlaces, currencyCode = currencyCode)
 }
 @Composable
 fun CostAmountRangeField(

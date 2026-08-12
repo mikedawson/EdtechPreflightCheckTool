@@ -168,7 +168,6 @@ fun PlanDetailScreen(
     uiState: PlanDetailUiState,
     onToggleSectionIdCollapse: (String) -> Unit = { },
 ) {
-    val currencySymbol = uiState.plan?.currency?.symbol?: ""
     val currencyCode = uiState.plan?.currency?.code ?: ""
     val plan = uiState.plan
 
@@ -209,24 +208,18 @@ fun PlanDetailScreen(
                 ) {
                     uiState.costTotals[PlanDetailViewModel.ID_TOTAL]?.also { grandTotals ->
                         InfoCard(
-                            headlineText = "Total cost/year",
-                            contentText = grandTotals.totalCost.toDisplayString(
-                                currencySymbol = currencySymbol
-                            )
+                            headlineText = "Total cost/year ($currencyCode)",
+                            contentText = grandTotals.totalCost.toDisplayString()
                         )
 
                         InfoCard(
-                            headlineText = "Marginal cost/student/year",
-                            contentText = grandTotals.totalMarginalCostPerStudent.toDisplayString(
-                                currencySymbol = currencySymbol
-                            )
+                            headlineText = "Marginal cost/student/year ($currencyCode)",
+                            contentText = grandTotals.totalMarginalCostPerStudent.toDisplayString()
                         )
 
                         InfoCard(
-                            headlineText = "Total cost/student/year",
-                            contentText = grandTotals.totalCostPerStudent.toDisplayString(
-                                currencySymbol = currencySymbol
-                            )
+                            headlineText = "Total cost/student/year ($currencyCode)",
+                            contentText = grandTotals.totalCostPerStudent.toDisplayString()
                         )
                     }
                 }
@@ -250,7 +243,7 @@ fun PlanDetailScreen(
                                 roiTotals.forEach { roiTotal ->
                                     Text(
                                         style = MaterialTheme.typography.headlineLarge,
-                                        text = "${roiTotal.roiFromPer100Currency.toDisplayString()}-${roiTotal.roiToPer100Currency.toDisplayString()} per 100 $currencySymbol $currencyCode",
+                                        text = "${roiTotal.roiFromPer100Currency.toDisplayString()}-${roiTotal.roiToPer100Currency.toDisplayString()} per 100 $currencyCode",
                                     )
                                     Text(roiTotal.unit.displayName)
                                     HorizontalDivider()
@@ -318,7 +311,7 @@ fun PlanDetailScreen(
                                 if(!isExpandedLayout) {
                                     totals?.also { _ ->
                                         CostTotalsColumn(
-                                            currencySymbol = currencySymbol,
+                                            currencyCode = currencyCode,
                                             totals = totals
                                         )
 
@@ -338,7 +331,7 @@ fun PlanDetailScreen(
                                 if(isExpandedLayout) {
                                     uiState.costTotals[category.id]?.also { totals ->
                                         CostTotalsColumn(
-                                            currencySymbol = currencySymbol,
+                                            currencyCode = currencyCode,
                                             totals = totals,
                                             textAlign = TextAlign.End,
                                             horizontalAlignment = Alignment.End,
@@ -390,7 +383,7 @@ fun PlanDetailScreen(
 
                                     if(!isExpandedLayout && totals != null) {
                                         CostTotalsColumn(
-                                            currencySymbol = currencySymbol,
+                                            currencyCode = currencyCode,
                                             totals = totals,
                                         )
                                     }
@@ -399,7 +392,7 @@ fun PlanDetailScreen(
                                     Row {
                                         if(isExpandedLayout && totals != null) {
                                             CostTotalsColumn(
-                                                currencySymbol = currencySymbol,
+                                                currencyCode = currencyCode,
                                                 totals = totals,
                                                 textAlign = TextAlign.End,
                                                 horizontalAlignment = Alignment.End,

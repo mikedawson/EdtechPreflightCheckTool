@@ -36,35 +36,41 @@ fun toFromPercentStr(from: Float?, to: Float?): String {
     }
 }
 
+fun String.withCommaSeparators(): String {
+    //If not reversed, 1234 would come out as 123,4
+    return reversed()
+        .chunked(3)
+        .joinToString(",")
+        .reversed()
+}
+
 /**
  * Remove the decimal point if this float has nothing after the decimal point.
  */
 fun Float.toDisplayString(
     decimalPlaces: Int = 2,
     padZeros: Boolean = true,
-    currencySymbol: String? = null,
+    currencyCode: String? = null,
 ): String {
     val strVal = toString()
     val thisFloat = this
 
     return buildString {
-        currencySymbol?.also {
+        currencyCode?.also {
             append("$it ")
         }
 
         append(
             if(round(thisFloat) == thisFloat) {
-                strVal.substringBefore('.')
+                strVal.substringBefore('.').withCommaSeparators()
             }else {
                 thisFloat.roundTo(decimalPlaces).toString().let {
+                    val subStrBeforePoint = it.substringBefore('.')
                     val subStrAfterPoint = it.substringAfter('.')
                     if(padZeros && subStrAfterPoint.length != decimalPlaces) {
-                        it.padEnd(
-                            length = (it.length + (decimalPlaces - subStrAfterPoint.length)),
-                            padChar = '0'
-                        )
+                        "$subStrBeforePoint.${subStrAfterPoint.padEnd(decimalPlaces - subStrAfterPoint.length, '0')}"
                     }else {
-                        it
+                        "${subStrBeforePoint.withCommaSeparators()}.$subStrAfterPoint"
                     }
                 }
             }

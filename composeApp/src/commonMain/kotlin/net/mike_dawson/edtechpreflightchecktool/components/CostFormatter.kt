@@ -21,10 +21,10 @@ fun formatCost(
             }
         }
 
-
-        append(currency.symbol)
         append(" ")
         append(cost.costAmount.toDisplayString())
+        append(" ")
+        append(currency.code)
         val costBasisTrailingText = cost.costBasis.placeholderTrailingText
 
         if(costBasisTrailingText != null) {
