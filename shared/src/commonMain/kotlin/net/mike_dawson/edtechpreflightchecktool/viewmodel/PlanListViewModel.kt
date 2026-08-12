@@ -2,6 +2,7 @@ package net.mike_dawson.edtechpreflightchecktool.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,9 @@ import net.mike_dawson.edtechpreflightchecktool.nav.PlanDetailDest
 import net.mike_dawson.edtechpreflightchecktool.nav.PlanEditDest
 
 data class PlanListUiState(
-    val plans: List<Plan> = emptyList()
+    val plans: List<Plan> = emptyList(),
+    val showFirstUseDialog: Boolean = false,
+    val dontShowFirstUseAgainChecked: Boolean = true,
 )
 
 class PlanListViewModel(
@@ -28,6 +31,7 @@ class PlanListViewModel(
     private val planDataSource: PlanDataSource,
     private val json: Json,
     private val snackBarDispatcher: SnackBarDispatcher,
+    private val settings: Settings,
 ): BaseViewModel(savedStateHandle) {
 
     private val _uiState = MutableStateFlow(PlanListUiState())
@@ -60,6 +64,10 @@ class PlanListViewModel(
             )
         }
 
+        if(!settings.getBoolean(DONT_SHOW_FIRST_USE_DIALOG, false)) {
+            _uiState.update { it.copy(showFirstUseDialog = true) }
+        }
+
         viewModelScope.launch {
             planDataSource.listAllAsFlow().collect {
                 _uiState.update { prev ->
@@ -90,6 +98,37 @@ class PlanListViewModel(
                 destination = PlanDetailDest(id = plan.id)
             )
         )
+    }
+
+
+    fun onDismissFirstUseDialog() {
+        _uiState.update {
+            it.copy(showFirstUseDialog = false)
+        }
+    }
+
+    fun onClickFirstUseDialogOk() {
+        if(uiState.value.dontShowFirstUseAgainChecked) {
+            println("setting dont show first use dialog")
+            settings.putBoolean(DONT_SHOW_FIRST_USE_DIALOG, true)
+        }
+
+        _uiState.update {
+            it.copy(showFirstUseDialog = false)
+        }
+    }
+
+    fun onChangeDontShowFirstUseDialogAgain(checked: Boolean) {
+        _uiState.update { it.copy(dontShowFirstUseAgainChecked = checked) }
+    }
+
+    companion object {
+
+        /**
+         * True when the first use dialog has been shown wiht the
+         */
+        const val DONT_SHOW_FIRST_USE_DIALOG = "first_use_dialog_shown"
+
     }
 
 }
